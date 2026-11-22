@@ -77,13 +77,17 @@ function showToast(message) {
 async function loadHome() {
   const sectionTitle = $("trending").querySelector("h2");
   try {
-    const [trending, popular, series] = await Promise.all([
+    const [trending, popularPages, series] = await Promise.all([
       tmdb("/trending/movie/week"),
-      tmdb("/movie/popular"),
+      Promise.all([1, 2, 3, 4, 5].map(page => tmdb("/movie/popular", { page: String(page) }))),
       tmdb("/tv/on_the_air")
     ]);
     catalogue.trending = (trending.results || []).map(item => normalize(item, "movie"));
-    catalogue.movies = (popular.results || []).map(item => normalize(item, "movie"));
+    // Five TMDB pages provide up to 100 popular movies in the collection.
+    catalogue.movies = popularPages
+      .flatMap(result => result.results || [])
+      .filter((item, index, all) => all.findIndex(other => other.id === item.id) === index)
+      .map(item => normalize(item, "movie"));
     catalogue.series = (series.results || []).map(item => normalize(item, "tv"));
     renderRow("trendingRow", catalogue.trending);
     renderRow("moviesRow", catalogue.movies);
