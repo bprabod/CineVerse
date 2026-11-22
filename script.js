@@ -151,13 +151,13 @@ async function openMovie(id, type) {
 
 document.addEventListener("click", event => {
   const card = event.target.closest(".movie-card");
-  if (card) openMovie(card.dataset.id, card.dataset.type);
+  if (card) window.location.href = `movie.html?id=${encodeURIComponent(card.dataset.id)}&type=${encodeURIComponent(card.dataset.type)}`;
 });
 
 document.addEventListener("keydown", event => {
   if ((event.key === "Enter" || event.key === " ") && event.target.matches(".movie-card")) {
     event.preventDefault();
-    openMovie(event.target.dataset.id, event.target.dataset.type);
+    window.location.href = `movie.html?id=${encodeURIComponent(event.target.dataset.id)}&type=${encodeURIComponent(event.target.dataset.type)}`;
   }
 });
 
