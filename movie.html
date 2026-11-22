@@ -29,6 +29,21 @@
           <button class="button button-primary" id="playButton" type="button">▶ Watch now</button>
           <button class="button button-secondary" id="listButton" type="button">＋ Add to my list</button>
         </div>
+        <section class="tv-episode-picker" id="tvEpisodePicker" hidden aria-label="Choose a TV episode">
+          <div class="tv-picker-heading">
+            <div><p class="section-kicker">START WATCHING</p><h2>Choose your episode</h2></div>
+          </div>
+          <div class="tv-picker-controls">
+            <label>Season
+              <select id="seasonSelect" aria-label="Choose season"><option value="">Loading seasons…</option></select>
+            </label>
+            <label>Episode
+              <select id="episodeSelect" aria-label="Choose episode" disabled><option value="">Choose a season first</option></select>
+            </label>
+            <button class="button button-primary" id="playEpisodeButton" type="button" disabled>▶ Play episode</button>
+          </div>
+          <p class="detail-muted" id="episodeStatus" role="status"></p>
+        </section>
       </section>
     </div>
     <section class="detail-facts" id="detailFacts" aria-label="More title information"></section>
