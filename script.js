@@ -3,6 +3,9 @@ const SUPABASE_URL = "https://suckecjeyzlpbpkspmau.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_-re693K9MBweYpZjW01fRQ_m-nXuhy1";
 const TMDB_PROXY = `${SUPABASE_URL}/functions/v1/tmdb-proxy`;
 const IMAGE_BASE = "https://image.tmdb.org/t/p/";
+// NexStream embed key supplied by the site owner. Note: iframe URLs are visible to visitors.
+const NEXSTREAM_API_KEY = "nx_73737077fdaf1355551e14c7f105f427";
+const NEXSTREAM_EMBED = "https://api.codespecters.com/embed/movie/";
 const FALLBACK_POSTER = "https://placehold.co/500x750/171717/eeeeee?text=CineVerse";
 
 const catalogue = { trending: [], movies: [], series: [] };
@@ -160,6 +163,32 @@ document.addEventListener("keydown", event => {
 
 $("dialogClose").addEventListener("click", () => dialog.close());
 dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); });
+
+const streamPlayer = $("streamPlayer");
+const streamFrame = $("streamFrame");
+
+$("dialogPlay").addEventListener("click", () => {
+  if (!activeMovie) return;
+  if (activeMovie.type !== "movie") {
+    showToast("NexStream movie playback is currently set up for movies.");
+    return;
+  }
+  const playerUrl = new URL(`${NEXSTREAM_EMBED}${encodeURIComponent(activeMovie.id)}`);
+  playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
+  streamFrame.src = playerUrl.toString();
+  streamPlayer.hidden = false;
+  streamPlayer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+
+$("closePlayer").addEventListener("click", () => {
+  streamFrame.src = "about:blank";
+  streamPlayer.hidden = true;
+});
+
+dialog.addEventListener("close", () => {
+  streamFrame.src = "about:blank";
+  streamPlayer.hidden = true;
+});
 
 $("dialogWatch").addEventListener("click", () => {
   if (!activeMovie) return;
