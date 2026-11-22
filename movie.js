@@ -111,7 +111,7 @@ async function loadTitle() {
     $("detailPoster").src = item.poster_path ? `${IMAGE_BASE}w780${item.poster_path}` : posterFallback;
     $("detailPoster").alt = `Poster for ${title}`;
     $("detailPoster").onerror = () => { $("detailPoster").src = posterFallback; };
-    $("detailMeta").innerHTML = `<span class="match">★ ${Number(item.vote_average || 0).toFixed(1)}</span><span>${year || "—"}</span><span class="rating">${type === "tv" ? "TV" : "TMDB"}</span><span>${Number(item.vote_count || 0).toLocaleString()} votes</span></div>`;
+    $("detailMeta").innerHTML = `<span class="match">★ ${Number(item.vote_average || 0).toFixed(1)}</span><span>${year || "—"}</span><span class="rating">${type === "tv" ? "TV" : "TMDB"}</span><span>${Number(item.vote_count || 0).toLocaleString()} votes</span>`;
     document.title = `${title} — CineVerse`;
     renderExtraDetails(item);
     renderCredits(item);
