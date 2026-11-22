@@ -97,6 +97,7 @@ async function loadHome() {
     renderRow("moviesRow", catalogue.movies);
     renderRow("seriesRow", catalogue.series);
     if (catalogue.trending[0]) updateHero(catalogue.trending[0]);
+    await loadDatabaseHero();
   } catch (error) {
     console.error("CineVerse catalogue error:", error);
     renderRow("trendingRow", []);
@@ -118,6 +119,42 @@ function updateHero(movie) {
   if (kicker) kicker.textContent = "TRENDING ON CINEVERSE";
   const meta = document.querySelector(".hero-meta");
   if (meta) meta.innerHTML = `<span class="match">★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span class="rating">TMDB</span><span>${movie.type === "tv" ? "Series" : "Movie"}</span>`;
+}
+
+async function loadDatabaseHero() {
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/homepage_background?select=title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`,
+      { headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, Accept: "application/json" } }
+    );
+    if (!response.ok) throw new Error("Could not read featured background from Supabase.");
+    const rows = await response.json();
+    const featured = rows[0];
+    if (!featured?.backdrop_path) return;
+
+    const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}`;
+    const preload = new Image();
+    preload.onload = () => {
+      const title = document.querySelector(".hero-content h1");
+      const description = document.querySelector(".hero-description");
+      const image = document.querySelector(".hero-image");
+      const kicker = document.querySelector(".hero-kicker");
+      const meta = document.querySelector(".hero-meta");
+      if (image) image.style.backgroundImage = `url("${backdrop}")`;
+      if (title) title.textContent = featured.title || "Trending now";
+      if (description) description.textContent = featured.overview || "Discover today's trending movie on CineVerse.";
+      if (kicker) kicker.textContent = "UPDATED DAILY FROM TMDB";
+      if (meta) {
+        const year = (featured.release_date || "").slice(0, 4) || "NOW TRENDING";
+        const rating = Number(featured.vote_average || 0).toFixed(1);
+        meta.innerHTML = `<span class="match">★ ${escapeHtml(rating)}</span><span>${escapeHtml(year)}</span><span class="rating">TMDB</span><span>Featured movie</span>`;
+      }
+    };
+    preload.onerror = () => console.warn("Could not load the Supabase featured backdrop image.");
+    preload.src = backdrop;
+  } catch (error) {
+    console.warn("Using live trending hero because the saved homepage background is unavailable:", error);
+  }
 }
 
 
