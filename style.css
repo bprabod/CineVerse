@@ -131,3 +131,177 @@
 .tv-episode-picker .detail-muted{padding:8px 0 0;margin:0;font-size:11px}
 @media(max-width:650px){.tv-episode-picker{padding:16px;margin-top:20px}.tv-picker-controls{grid-template-columns:1fr 1fr}.tv-picker-controls button{grid-column:1/-1;width:100%}}
 @media(max-width:390px){.tv-picker-controls{grid-template-columns:1fr}}
+
+
+/* Keep the title details page visually consistent with the CineVerse home page */
+.detail-page{
+  min-height:100vh;
+  background:var(--bg);
+  background-image:none;
+}
+.detail-site-header{
+  position:sticky;
+  top:0;
+  left:auto;
+  right:auto;
+  height:76px;
+  padding:0 6.2%;
+  background:rgba(9,9,9,.96);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px);
+}
+.detail-site-header .brand{margin:0;letter-spacing:-1.3px}
+.detail-site-header .main-nav{margin-right:auto}
+.detail-site-header .icon-button{display:grid;place-items:center}
+.detail-site-header .profile-button{display:grid;place-items:center}
+.detail-main{
+  max-width:1320px;
+  margin:0 auto;
+  padding:42px 6.2% 80px;
+}
+.detail-main>.section-kicker{color:#999;letter-spacing:2px}
+.detail-layout{
+  grid-template-columns:minmax(220px,300px) minmax(0,1fr);
+  gap:clamp(28px,5vw,64px);
+  align-items:center;
+  margin-top:20px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+  overflow:visible;
+}
+.detail-layout:before{display:none}
+.detail-poster{
+  position:relative;
+  z-index:auto;
+  width:100%;
+  max-height:450px;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  border:0;
+  border-radius:5px;
+  box-shadow:0 18px 45px #0009;
+}
+.detail-copy{position:relative;z-index:auto;padding:0}
+.detail-copy h1{
+  font-size:clamp(38px,5vw,70px);
+  line-height:1;
+  letter-spacing:-2.8px;
+  margin:0 0 20px;
+}
+.detail-copy .hero-meta{gap:13px;font-size:12px;color:#d0d0d0}
+.detail-copy .hero-meta>span{
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:none;
+}
+.detail-copy .hero-meta .match{color:#46d369}
+.detail-copy .hero-meta .rating{border:1px solid #666;padding:2px 6px}
+.detail-overview{
+  max-width:680px;
+  color:#c5c5c5;
+  font-size:14px;
+  line-height:1.8;
+  margin:23px 0 27px;
+}
+.detail-actions{gap:10px}
+.detail-actions .button{min-height:42px;padding:12px 19px;border-radius:4px}
+.detail-actions .button-primary{box-shadow:none}
+.detail-actions .button-secondary{background:rgba(109,109,110,.65);border:0}
+.detail-facts{
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:1px;
+  margin:42px 0 54px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:5px;
+  overflow:hidden;
+}
+.detail-fact{
+  min-height:82px;
+  padding:16px;
+  background:#151515;
+  border:0;
+  border-radius:0;
+}
+.detail-fact span{color:#999;font-size:9px;letter-spacing:1.3px}
+.detail-fact strong{font-size:12px;color:#eee}
+.detail-extra{margin:0 0 52px}
+.detail-section-heading{display:block;margin-bottom:18px}
+.detail-section-heading .section-kicker{color:#999}
+.detail-section-heading h2{font-size:25px;letter-spacing:-.8px}
+.cast-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:13px}
+.cast-card{
+  background:#151515;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:5px;
+  box-shadow:none;
+}
+.cast-card:hover{transform:translateY(-3px);border-color:rgba(229,9,20,.4);box-shadow:0 10px 25px #0008}
+.cast-card img{aspect-ratio:2/2.55;object-position:center 25%}
+.cast-card div{padding:10px 11px 12px}
+.cast-card h3{font-size:12px;color:#f4f4f5}
+.cast-card p{font-size:10px;color:#999}
+.crew-list{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.crew-person{
+  padding:14px 16px;
+  background:#151515;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:5px;
+}
+.crew-person span{color:#999;font-size:9px}
+.crew-person strong{font-size:12px;color:#eee}
+.detail-player{
+  margin-top:55px;
+  padding:22px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#111;
+}
+.player-heading h2{font-size:22px}
+.detail-frame-wrap{border:0;border-radius:5px}
+.detail-status{background:#151515;border-radius:5px}
+.detail-muted{color:#999}
+.tv-episode-picker{
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#151515;
+}
+.tv-picker-controls select{background:#090909;border-color:#444}
+.tv-picker-controls select:focus{border-color:var(--red)}
+@media(max-width:760px){
+  .detail-site-header{height:65px;padding:0 5%;gap:22px}
+  .detail-site-header .brand{font-size:20px}
+  .detail-site-header .main-nav{gap:15px;font-size:11px}
+  .detail-main{padding:30px 5% 65px}
+  .detail-layout{grid-template-columns:145px minmax(0,1fr);gap:20px;padding:0}
+  .detail-poster{max-height:225px;border-radius:5px}
+  .detail-copy h1{font-size:clamp(25px,6vw,36px);letter-spacing:-1px;margin-bottom:12px}
+  .detail-copy .hero-meta{gap:9px;font-size:10px}
+  .detail-copy .hero-meta>span{padding:0}
+  .detail-overview{font-size:12px;line-height:1.65;margin:14px 0 17px}
+  .detail-actions{gap:7px}
+  .detail-actions .button{min-height:39px;padding:9px 11px;font-size:10px}
+  .detail-facts{gap:1px;margin:26px 0 40px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .detail-fact{min-height:72px;padding:12px}
+  .detail-section-heading h2{font-size:21px}
+  .cast-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+  .cast-card div{padding:8px}
+  .cast-card h3{font-size:10px}
+  .cast-card p{font-size:9px}
+  .detail-extra{margin-bottom:40px}
+  .detail-player{padding:14px;margin-top:38px}
+}
+@media(max-width:480px){
+  .detail-site-header .main-nav a:nth-child(3),
+  .detail-site-header .main-nav a:nth-child(4){display:none}
+  .detail-layout{grid-template-columns:1fr}
+  .detail-poster{width:145px;max-height:218px}
+  .detail-copy h1{font-size:32px}
+  .detail-copy .hero-meta{font-size:10px}
+  .detail-overview{font-size:13px}
+  .detail-actions .button{font-size:11px;padding:10px 13px}
+}
