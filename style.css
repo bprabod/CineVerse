@@ -305,3 +305,58 @@
   .detail-overview{font-size:13px}
   .detail-actions .button{font-size:11px;padding:10px 13px}
 }
+
+
+/* Homepage search — styled to match the CineVerse interface */
+.search-section{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:24px 6.2%;
+  background:linear-gradient(90deg,rgba(229,9,20,.09),rgba(21,21,21,.96) 34%,rgba(21,21,21,.96));
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.search-section[hidden]{display:none}
+.search-label{
+  color:#eee;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.2px;
+}
+.search-section input{
+  display:block;
+  width:min(100%,560px);
+  max-width:none;
+  min-width:0;
+  height:46px;
+  padding:0 16px;
+  color:#f5f5f5;
+  background:#090909;
+  border:1px solid #454545;
+  border-radius:4px;
+  outline:none;
+  font:500 13px "DM Sans",Arial,sans-serif;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.search-section input::placeholder{color:#858585}
+.search-section input:focus{
+  border-color:var(--red);
+  background:#101010;
+  box-shadow:0 0 0 3px rgba(229,9,20,.13);
+}
+.search-section input::-webkit-search-cancel-button{cursor:pointer}
+.search-section .text-button{
+  padding:10px 12px;
+  color:#c5c5c5;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:4px;
+  transition:background .2s,color .2s;
+}
+.search-section .text-button:hover{background:#292929;color:#fff}
+@media(max-width:760px){
+  .search-section{padding:18px 5%;gap:9px;flex-wrap:wrap}
+  .search-label{width:100%}
+  .search-section input{flex:1;width:auto;height:43px}
+  .search-section .text-button{height:43px}
+}
