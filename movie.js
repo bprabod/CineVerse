@@ -19,7 +19,8 @@ function goBack() {
   if (history.length > 1 && document.referrer.startsWith(location.origin)) history.back();
   else location.href = "index.html";
 }
-$("backButton").addEventListener("click", goBack);
+const backButton = $("backButton");
+if (backButton) backButton.addEventListener("click", goBack);
 
 async function tmdb(path, extra = {}) {
   const query = new URLSearchParams({ path, ...extra });
