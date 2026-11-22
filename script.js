@@ -51,16 +51,16 @@ function normalize(item, type = "movie") {
 }
 
 function movieCard(movie) {
-  return `<article class="movie-card" tabindex="0" role="button"
-    aria-label="View details for ${escapeHtml(movie.title)}"
-    data-id="${movie.id}" data-type="${movie.type}">
+  const detailsUrl = `movie.html?id=${encodeURIComponent(movie.id)}&type=${encodeURIComponent(movie.type)}`;
+  return `<a class="movie-card" href="${detailsUrl}"
+    aria-label="View details for ${escapeHtml(movie.title)}">
     <img class="poster" src="${escapeHtml(movie.image)}" alt="Poster for ${escapeHtml(movie.title)}"
       loading="lazy" onerror="this.src='${FALLBACK_POSTER}'">
     <div class="card-gradient"></div>
     <span class="card-top">${movie.type === "tv" ? "SERIES" : "TMDB"}</span>
     <div class="card-info"><h3>${escapeHtml(movie.title)}</h3>
       <p>${escapeHtml(movie.year)} &nbsp;·&nbsp; ★ ${escapeHtml(movie.rating)}</p></div>
-  </article>`;
+  </a>`;
 }
 
 function renderRow(id, list) {
@@ -187,17 +187,7 @@ async function openMovie(id, type) {
   if (!dialog.open) dialog.showModal();
 }
 
-document.addEventListener("click", event => {
-  const card = event.target.closest(".movie-card");
-  if (card) window.location.href = `movie.html?id=${encodeURIComponent(card.dataset.id)}&type=${encodeURIComponent(card.dataset.type)}`;
-});
-
-document.addEventListener("keydown", event => {
-  if ((event.key === "Enter" || event.key === " ") && event.target.matches(".movie-card")) {
-    event.preventDefault();
-    window.location.href = `movie.html?id=${encodeURIComponent(event.target.dataset.id)}&type=${encodeURIComponent(event.target.dataset.type)}`;
-  }
-});
+// Movie cards are real links, so mouse, touch, keyboard, and open-in-new-tab work natively.
 
 $("dialogClose").addEventListener("click", () => dialog.close());
 dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); });
