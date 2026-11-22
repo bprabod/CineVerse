@@ -201,6 +201,23 @@ $("playEpisodeButton").addEventListener("click", () => {
   $("playerSection").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
+$("fullscreenButton").addEventListener("click", async () => {
+  const player = $("playerFrameWrap");
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else if (player.requestFullscreen) {
+      await player.requestFullscreen();
+    } else if (player.webkitRequestFullscreen) {
+      player.webkitRequestFullscreen();
+    } else {
+      $("detailStatus").textContent = "Fullscreen is not supported by this browser.";
+    }
+  } catch (error) {
+    $("detailStatus").textContent = "Could not enter fullscreen. Try the player's own fullscreen control.";
+  }
+});
+
 $("stopButton").addEventListener("click", () => {
   $("playerFrame").src = "about:blank";
   $("playerSection").hidden = true;
