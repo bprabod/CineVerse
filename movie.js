@@ -3,11 +3,14 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_-re693K9MBweYpZjW01fRQ_m-nXuhy1
 const TMDB_PROXY = `${SUPABASE_URL}/functions/v1/tmdb-proxy`;
 const IMAGE_BASE = "https://image.tmdb.org/t/p/";
 const NEXSTREAM_API_KEY = "nx_73737077fdaf1355551e14c7f105f427";
-const NEXSTREAM_EMBED = "https://api.codespecters.com/embed/movie/";
+const NEXSTREAM_MOVIE_EMBED = "https://api.codespecters.com/embed/movie/";
+const NEXSTREAM_TV_EMBED = "https://api.codespecters.com/embed/tv/";
 const params = new URLSearchParams(location.search);
 const id = params.get("id");
 const type = params.get("type") === "tv" ? "tv" : "movie";
 let currentTitle = null;
+let currentEpisodes = [];
+let selectedSeason = null;
 const $ = id => document.getElementById(id);
 const posterFallback = "https://placehold.co/500x750/171717/eeeeee?text=CineVerse";
 const profileFallback = "https://placehold.co/300x450/202020/eeeeee?text=No+Photo";
@@ -115,7 +118,19 @@ async function loadTitle() {
     document.title = `${title} — CineVerse`;
     renderExtraDetails(item);
     renderCredits(item);
-    if (type === "tv") $("playButton").textContent = "TV playback unavailable";
+    if (type === "tv") {
+      $("playButton").textContent = "Choose an episode";
+      $("tvEpisodePicker").hidden = false;
+      const seasons = (item.seasons || []).filter(season => Number(season.season_number) >= 1);
+      $("seasonSelect").innerHTML = seasons.length
+        ? seasons.map(season => `<option value="${Number(season.season_number)}">Season ${Number(season.season_number)} · ${Number(season.episode_count || 0)} episodes</option>`).join("")
+        : '<option value="">No seasons available</option>';
+      if (seasons.length) {
+        await loadSeasonEpisodes(Number(seasons[0].season_number));
+      } else {
+        $("episodeStatus").textContent = "No regular seasons are listed for this series.";
+      }
+    }
   } catch (error) {
     $("detailTitle").textContent = "Could not load title";
     $("detailOverview").textContent = error.message || "Please try again.";
@@ -124,15 +139,63 @@ async function loadTitle() {
   }
 }
 
+async function loadSeasonEpisodes(seasonNumber) {
+  selectedSeason = Number(seasonNumber);
+  currentEpisodes = [];
+  $("episodeSelect").disabled = true;
+  $("playEpisodeButton").disabled = true;
+  $("episodeSelect").innerHTML = '<option value="">Loading episodes…</option>';
+  $("episodeStatus").textContent = "Loading episode list…";
+  try {
+    const season = await tmdb(`/tv/${encodeURIComponent(id)}/season/${selectedSeason}`);
+    currentEpisodes = season.episodes || [];
+    $("episodeSelect").innerHTML = currentEpisodes.length
+      ? currentEpisodes.map(episode => {
+          const number = Number(episode.episode_number);
+          const name = escapeHtml(episode.name || `Episode ${number}`);
+          return `<option value="${number}">E${String(number).padStart(2, "0")} · ${name}</option>`;
+        }).join("")
+      : '<option value="">No episodes available</option>';
+    $("episodeSelect").disabled = !currentEpisodes.length;
+    $("playEpisodeButton").disabled = !currentEpisodes.length;
+    $("episodeStatus").textContent = currentEpisodes.length
+      ? `${currentEpisodes.length} episodes available in Season ${selectedSeason}.`
+      : "No episodes were returned for this season.";
+  } catch (error) {
+    $("episodeSelect").innerHTML = '<option value="">Could not load episodes</option>';
+    $("episodeStatus").textContent = error.message || "Could not load this season.";
+  }
+}
+
+$("seasonSelect").addEventListener("change", event => {
+  if (event.target.value) loadSeasonEpisodes(Number(event.target.value));
+});
+
 $("playButton").addEventListener("click", () => {
   if (!currentTitle) return;
-  if (type !== "movie") {
-    $("detailStatus").textContent = "TV episode playback needs a season and episode selection.";
+  if (type === "tv") {
+    $("tvEpisodePicker").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("seasonSelect").focus();
     return;
   }
-  const playerUrl = new URL(`${NEXSTREAM_EMBED}${encodeURIComponent(id)}`);
+  const playerUrl = new URL(`${NEXSTREAM_MOVIE_EMBED}${encodeURIComponent(id)}`);
   playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
   $("playerFrame").src = playerUrl.toString();
+  $("playerHeading").textContent = `Now playing · ${currentTitle.title || currentTitle.name || "Movie"}`;
+  $("playerSection").hidden = false;
+  $("playerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+$("playEpisodeButton").addEventListener("click", () => {
+  if (type !== "tv" || !currentEpisodes.length || !selectedSeason) return;
+  const episodeNumber = Number($("episodeSelect").value);
+  if (!episodeNumber) return;
+  const episode = currentEpisodes.find(item => Number(item.episode_number) === episodeNumber);
+  if (!episode) return;
+  const playerUrl = new URL(`${NEXSTREAM_TV_EMBED}${encodeURIComponent(id)}/${selectedSeason}/${episodeNumber}`);
+  playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
+  $("playerFrame").src = playerUrl.toString();
+  $("playerHeading").textContent = `Now playing · S${String(selectedSeason).padStart(2, "0")} E${String(episodeNumber).padStart(2, "0")} — ${episode.name || "Episode"}`;
   $("playerSection").hidden = false;
   $("playerSection").scrollIntoView({ behavior: "smooth", block: "start" });
 });
