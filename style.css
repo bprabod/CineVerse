@@ -116,3 +116,18 @@
   .detail-overview{font-size:13px}
   .detail-actions .button{font-size:11px;padding:10px 13px}
 }
+
+
+/* TV season and episode picker */
+.tv-episode-picker{margin-top:26px;padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:13px;background:linear-gradient(135deg,rgba(255,255,255,.065),rgba(255,255,255,.025))}
+.tv-episode-picker[hidden]{display:none}
+.tv-picker-heading{margin-bottom:17px}
+.tv-picker-heading h2{font-size:21px;margin:0;letter-spacing:-.5px}
+.tv-picker-controls{display:grid;grid-template-columns:minmax(130px,.8fr) minmax(180px,1.3fr) auto;gap:12px;align-items:end}
+.tv-picker-controls label{display:flex;flex-direction:column;gap:8px;color:#b7b8c0;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.tv-picker-controls select{width:100%;min-height:44px;padding:0 12px;border-radius:7px;border:1px solid rgba(255,255,255,.14);background:#17191f;color:#f4f4f5;font:inherit;font-size:12px;letter-spacing:0;text-transform:none;outline:none}
+.tv-picker-controls select:focus{border-color:#ed5360}
+.tv-picker-controls button{min-height:44px;white-space:nowrap}
+.tv-episode-picker .detail-muted{padding:8px 0 0;margin:0;font-size:11px}
+@media(max-width:650px){.tv-episode-picker{padding:16px;margin-top:20px}.tv-picker-controls{grid-template-columns:1fr 1fr}.tv-picker-controls button{grid-column:1/-1;width:100%}}
+@media(max-width:390px){.tv-picker-controls{grid-template-columns:1fr}}
