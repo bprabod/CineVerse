@@ -258,10 +258,46 @@ $("clearSearch").addEventListener("click", () => {
   searchInput.focus();
 });
 
-$("newsletterForm").addEventListener("submit", event => {
+$("newsletterForm").addEventListener("submit", async event => {
   event.preventDefault();
-  $("formMessage").textContent = "Thanks for your interest! Newsletter signup will be added in a future update.";
-  event.target.reset();
+  const form = event.currentTarget;
+  const emailInput = $("emailInput");
+  const submitButton = $("newsletterSubmit");
+  const message = $("formMessage");
+  const email = emailInput.value.trim().toLowerCase();
+
+  if (!form.reportValidity()) return;
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Joining...";
+  message.textContent = "";
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/newsletter_subscribers`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=ignore-duplicates,return=minimal"
+      },
+      body: JSON.stringify({ email })
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || "We couldn't save your email. Please try again.");
+    }
+
+    message.textContent = "You're on the list! Thanks for subscribing.";
+    form.reset();
+  } catch (error) {
+    console.error("Newsletter signup error:", error);
+    message.textContent = error.message || "Something went wrong. Please try again.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.innerHTML = 'Join the list <span>→</span>';
+  }
 });
 
 $("year").textContent = new Date().getFullYear();
