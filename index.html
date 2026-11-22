@@ -69,7 +69,7 @@
 
     <section class="newsletter">
       <div><p class="section-kicker">THE CINEVERSE EDIT</p><h2>Good stories. Zero spoilers.</h2><p>Get a little inspiration for your next movie night.</p></div>
-      <form id="newsletterForm"><label class="sr-only" for="emailInput">Email address</label><input id="emailInput" type="email" placeholder="Your email address" required><button class="button button-primary" type="submit">Join the list <span>→</span></button></form>
+      <form id="newsletterForm"><label class="sr-only" for="emailInput">Email address</label><input id="emailInput" type="email" placeholder="Your email address" autocomplete="email" maxlength="254" required><label class="newsletter-consent"><input id="newsletterConsent" type="checkbox" required><span>I agree to receive occasional CineVerse movie updates by email.</span></label><button class="button button-primary" id="newsletterSubmit" type="submit">Join the list <span>→</span></button></form>
       <p class="form-message" id="formMessage" aria-live="polite"></p>
     </section>
   </main>
