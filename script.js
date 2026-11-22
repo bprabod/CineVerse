@@ -12,7 +12,7 @@ const catalogue = { trending: [], movies: [], series: [] };
 let searchResults = [];
 let searchTimer;
 let toastTimer;
-let activeMovie = null;\nlet activeGenreId = "28";
+let activeMovie = null;
 
 const $ = id => document.getElementById(id);
 const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
