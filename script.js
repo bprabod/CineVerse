@@ -12,7 +12,7 @@ const catalogue = { trending: [], movies: [], series: [] };
 let searchResults = [];
 let searchTimer;
 let toastTimer;
-let activeMovie = null;
+let activeMovie = null;\nlet activeGenreId = "28";
 
 const $ = id => document.getElementById(id);
 const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -120,6 +120,34 @@ function updateHero(movie) {
   if (meta) meta.innerHTML = `<span class="match">★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span class="rating">TMDB</span><span>${movie.type === "tv" ? "Series" : "Movie"}</span>`;
 }
 
+
+async function loadGenre(genreId, genreName) {
+  activeGenreId = String(genreId);
+  $("genreTitle").textContent = `Popular ${genreName} movies`;
+  $("genreStatus").textContent = "Loading…";
+  document.querySelectorAll(".genre-chip").forEach(button => {
+    const selected = button.dataset.genreId === activeGenreId;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  try {
+    const data = await tmdb("/discover/movie", {
+      with_genres: activeGenreId,
+      sort_by: "popularity.desc",
+      include_adult: "false",
+      page: "1"
+    });
+    const movies = (data.results || []).map(item => normalize(item, "movie"));
+    renderRow("genreRow", movies);
+    $("genreStatus").textContent = `${movies.length} titles`;
+  } catch (error) {
+    console.error("CineVerse genre error:", error);
+    renderRow("genreRow", []);
+    $("genreStatus").textContent = "Could not load genre";
+    showToast("Genre titles could not be loaded. Please try again.");
+  }
+}
+
 const dialog = $("movieDialog");
 
 async function openMovie(id, type) {
@@ -205,6 +233,12 @@ $("dialogWatch").addEventListener("click", () => {
   dialog.close();
 });
 
+$("genreList").addEventListener("click", event => {
+  const button = event.target.closest(".genre-chip");
+  if (!button) return;
+  loadGenre(button.dataset.genreId, button.textContent.trim());
+});
+
 document.querySelectorAll("[data-scroll]").forEach(button => {
   button.addEventListener("click", () => {
     const row = $(button.dataset.scroll);
@@ -259,4 +293,4 @@ $("clearSearch").addEventListener("click", () => {
 });
 
 $("year").textContent = new Date().getFullYear();
-loadHome();
+loadHome();\nloadGenre("28", "Action");
