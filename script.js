@@ -6,6 +6,7 @@ const IMAGE_BASE = "https://image.tmdb.org/t/p/";
 const FALLBACK_POSTER = "https://placehold.co/500x750/171717/eeeeee?text=CineVerse";
 
 const catalogue = { trending: [], movies: [], series: [] };
+let searchResults = [];
 let searchTimer;
 let toastTimer;
 let activeMovie = null;
@@ -119,7 +120,7 @@ function updateHero(movie) {
 const dialog = $("movieDialog");
 
 async function openMovie(id, type) {
-  let movie = [...catalogue.trending, ...catalogue.movies, ...catalogue.series]
+  let movie = [...catalogue.trending, ...catalogue.movies, ...catalogue.series, ...searchResults]
     .find(item => String(item.id) === String(id) && item.type === type);
   if (!movie) return;
   activeMovie = movie;
@@ -205,12 +206,13 @@ async function searchTitles() {
   section.querySelector("h2").textContent = `Searching for “${query}”...`;
   try {
     const data = await tmdb("/search/multi", { query, include_adult: "false" });
-    const results = (data.results || [])
+    searchResults = (data.results || [])
       .filter(item => item.media_type === "movie" || item.media_type === "tv")
       .map(item => normalize(item, item.media_type));
-    section.querySelector("h2").textContent = `${results.length} title${results.length === 1 ? "" : "s"} found`;
-    renderRow("trendingRow", results);
+    section.querySelector("h2").textContent = `${searchResults.length} title${searchResults.length === 1 ? "" : "s"} found`;
+    renderRow("trendingRow", searchResults);
   } catch (error) {
+    searchResults = [];
     section.querySelector("h2").textContent = "Search unavailable";
     renderRow("trendingRow", []);
     showToast(error.message);
