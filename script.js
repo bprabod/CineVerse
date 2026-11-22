@@ -289,7 +289,23 @@ $("newsletterForm").addEventListener("submit", async event => {
       throw new Error(error.message || "We couldn't save your email. Please try again.");
     }
 
-    message.textContent = "You're on the list! Thanks for subscribing.";
+    // Send a welcome email through the server-side Resend integration.
+    try {
+      const welcomeResponse = await fetch(`${SUPABASE_URL}/functions/v1/newsletter-mailer`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ action: "welcome", email })
+      });
+      if (!welcomeResponse.ok) throw new Error("Welcome email is not configured yet.");
+      message.textContent = "You're subscribed! Check your inbox for a welcome email.";
+    } catch (mailError) {
+      console.warn("Welcome email delivery pending:", mailError);
+      message.textContent = "Your subscription was saved. Welcome emails will arrive once email delivery is configured.";
+    }
     form.reset();
   } catch (error) {
     console.error("Newsletter signup error:", error);
