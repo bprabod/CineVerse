@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090909">
+  <meta name="description" content="Movie details and playback on CineVerse.">
+  <title>Title details — CineVerse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="movie.js"></script>
+</head>
+<body class="detail-page">
+  <header class="detail-header">
+    <button class="button button-secondary back-button" id="backButton" type="button">← Back</button>
+    <a class="brand" href="index.html">CINE<span>VERSE</span></a>
+  </header>
+  <main class="detail-main">
+    <p class="section-kicker" id="detailType">TITLE DETAILS</p>
+    <div class="detail-layout">
+      <img class="detail-poster" id="detailPoster" src="https://placehold.co/500x750/171717/eeeeee?text=CineVerse" alt="Title poster">
+      <section class="detail-copy">
+        <h1 id="detailTitle">Loading title…</h1>
+        <div class="hero-meta" id="detailMeta"></div>
+        <p class="detail-overview" id="detailOverview">Getting title information…</p>
+        <div class="detail-actions">
+          <button class="button button-primary" id="playButton" type="button">▶ Watch now</button>
+          <button class="button button-secondary" id="listButton" type="button">＋ Add to my list</button>
+        </div>
+      </section>
+    </div>
+    <section class="detail-player" id="playerSection" hidden>
+      <div class="player-heading"><h2>Now playing</h2><button class="text-button" id="stopButton" type="button">Stop player</button></div>
+      <div class="detail-frame-wrap"><iframe id="playerFrame" title="NexStream video player" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
+    </section>
+    <p class="detail-status" id="detailStatus" role="status"></p>
+  </main>
+</body>
+</html>
