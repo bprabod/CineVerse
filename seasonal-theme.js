@@ -1,12 +1,18 @@
-/* CineVerse seasonal atmosphere: date-based, subtle, and never replaces the site's core identity. */
+/* CineVerse seasonal atmosphere: automatic by date, with URL-only preview overrides. */
 (() => {
   const date = new Date();
-  const month = date.getMonth(); // Local device calendar.
+  const month = date.getMonth();
   const day = date.getDate();
+  const requested = new URLSearchParams(window.location.search).get("theme");
 
   let season = "default";
-  if (month === 11) season = "christmas";
-  else if (month === 9 && day >= 20) season = "halloween";
+  if (requested === "christmas" || requested === "halloween") {
+    season = requested; // Preview only; does not save or change the calendar.
+  } else if (month === 11) {
+    season = "christmas";
+  } else if (month === 9 && day >= 20) {
+    season = "halloween";
+  }
 
   document.body.classList.add(`season-${season}`);
   document.documentElement.dataset.season = season;
