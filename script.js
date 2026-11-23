@@ -123,37 +123,76 @@ function updateHero(movie) {
 
 async function loadDatabaseHero() {
   try {
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/homepage_background?select=title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`,
-      { headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, Accept: "application/json" } }
-    );
-    if (!response.ok) throw new Error("Could not read featured background from Supabase.");
-    const rows = await response.json();
-    const featured = rows[0];
-    if (!featured?.backdrop_path) return;
-
-    const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}`;
-    const preload = new Image();
-    preload.onload = () => {
-      const title = document.querySelector(".hero-content h1");
-      const description = document.querySelector(".hero-description");
-      const image = document.querySelector(".hero-image");
-      const kicker = document.querySelector(".hero-kicker");
-      const meta = document.querySelector(".hero-meta");
-      if (image) image.style.backgroundImage = `url("${backdrop}")`;
-      if (title) title.textContent = featured.title || "Trending now";
-      if (description) description.textContent = featured.overview || "Discover today's trending movie on CineVerse.";
-      if (kicker) kicker.textContent = "UPDATED DAILY FROM TMDB";
-      if (meta) {
-        const year = (featured.release_date || "").slice(0, 4) || "NOW TRENDING";
-        const rating = Number(featured.vote_average || 0).toFixed(1);
-        meta.innerHTML = `<span class="match">★ ${escapeHtml(rating)}</span><span>${escapeHtml(year)}</span><span class="rating">TMDB</span><span>Featured movie</span>`;
-      }
+    const headers = {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+      Accept: "application/json"
     };
-    preload.onerror = () => console.warn("Could not load the Supabase featured backdrop image.");
-    preload.src = backdrop;
+    const [backgroundResponse, contentResponse] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/homepage_background?select=title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`, { headers }),
+      fetch(`${SUPABASE_URL}/rest/v1/homepage_content?select=*&id=eq.1`, { headers })
+    ]);
+
+    if (backgroundResponse.ok) {
+      const rows = await backgroundResponse.json();
+      const featured = rows[0];
+      if (featured?.backdrop_path) {
+        const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}`;
+        const preload = new Image();
+        preload.onload = () => {
+          const image = document.querySelector(".hero-image");
+          if (image) image.style.backgroundImage = `url("${backdrop}")`;
+        };
+        preload.onerror = () => console.warn("Could not load the Supabase featured backdrop image.");
+        preload.src = backdrop;
+      }
+    } else {
+      console.warn("Could not read featured background from Supabase.");
+    }
+
+    if (contentResponse.ok) {
+      const rows = await contentResponse.json();
+      const content = rows[0];
+      if (content) {
+        const eyebrow = document.querySelector(".hero-content .eyebrow");
+        const kicker = document.querySelector(".hero-kicker");
+        const title = document.querySelector(".hero-content h1");
+        const description = document.querySelector(".hero-description");
+        const meta = document.querySelector(".hero-meta");
+        const cta = document.querySelector(".hero-buttons .button-primary");
+        const sideNote = document.querySelector(".hero-side-note");
+
+        if (eyebrow) eyebrow.innerHTML = `<span class="live-dot"></span> ${escapeHtml(content.eyebrow)}`;
+        if (kicker) kicker.textContent = content.kicker || "";
+        if (title) title.innerHTML = `${escapeHtml(content.title_line1)}<br><span>${escapeHtml(content.title_line2)}</span>`;
+        if (description) description.textContent = content.description || "";
+        if (meta) {
+          meta.innerHTML = [
+            content.match_label ? `<span class="match">${escapeHtml(content.match_label)}</span>` : "",
+            content.year_label ? `<span>${escapeHtml(content.year_label)}</span>` : "",
+            content.rating_label ? `<span class="rating">${escapeHtml(content.rating_label)}</span>` : "",
+            content.duration_label ? `<span>${escapeHtml(content.duration_label)}</span>` : "",
+            content.quality_label ? `<span class="quality">${escapeHtml(content.quality_label)}</span>` : ""
+          ].join("");
+        }
+        if (cta) {
+          cta.innerHTML = `<span class="play-symbol">▶</span> ${escapeHtml(content.cta_label || "Explore titles")}`;
+          cta.setAttribute("href", content.cta_href || "#trending");
+        }
+        if (sideNote) {
+          sideNote.textContent = content.side_note || "";
+          if (content.side_count) {
+            const count = document.createElement("span");
+            count.textContent = content.side_count;
+            sideNote.append(" ", count);
+          }
+        }
+      }
+    } else {
+      console.warn("Could not read homepage text content from Supabase.");
+    }
   } catch (error) {
-    console.warn("Using live trending hero because the saved homepage background is unavailable:", error);
+    console.warn("Using the built-in homepage hero because saved homepage content is unavailable:", error);
   }
 }
 
