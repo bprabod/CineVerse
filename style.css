@@ -451,3 +451,61 @@ body.season-christmas::after {
     radial-gradient(1px 1px at 48px 190px, rgba(210,255,225,.95) 98%, transparent),
     radial-gradient(1.5px 1.5px at 232px 42px, rgba(255,220,225,.95) 98%, transparent);
 }
+
+/* Christmas atmosphere — visible festive details, while preserving the original CineVerse hero and layout. */
+body.season-christmas .hero-shade {
+  background:
+    radial-gradient(ellipse at 84% 18%, rgba(24, 112, 62, .20), transparent 38%),
+    linear-gradient(90deg, #090909 0%, rgba(9,9,9,.92) 18%, rgba(9,9,9,.55) 49%, rgba(9,9,9,.08) 100%),
+    linear-gradient(0deg, #090909 0%, transparent 38%, rgba(0,0,0,.15) 100%);
+}
+body.season-christmas .hero::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  top: 76px;
+  left: 0;
+  right: 0;
+  height: 42px;
+  opacity: .88;
+  background:
+    radial-gradient(circle at 8% 17px, #e8d4a1 0 2px, transparent 3px),
+    radial-gradient(circle at 19% 25px, #c92739 0 5px, transparent 6px),
+    radial-gradient(circle at 31% 18px, #398b58 0 4px, transparent 5px),
+    radial-gradient(circle at 44% 27px, #e8d4a1 0 3px, transparent 4px),
+    radial-gradient(circle at 57% 17px, #c92739 0 5px, transparent 6px),
+    radial-gradient(circle at 70% 25px, #398b58 0 4px, transparent 5px),
+    radial-gradient(circle at 83% 17px, #e8d4a1 0 3px, transparent 4px),
+    radial-gradient(circle at 94% 25px, #c92739 0 5px, transparent 6px),
+    linear-gradient(176deg, transparent 0 10px, rgba(205,184,135,.7) 10px 11px, transparent 12px);
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,.65));
+}
+body.season-christmas .hero .eyebrow {
+  color: #d8f0df;
+  text-shadow: 0 0 16px rgba(66, 200, 121, .3);
+}
+body.season-christmas .hero .live-dot {
+  box-shadow: 0 0 8px #42c879, 0 0 20px rgba(66, 200, 121, .55);
+}
+body.season-christmas .hero .button-primary {
+  box-shadow: 0 8px 28px rgba(213, 31, 50, .32), 0 0 18px rgba(213, 31, 50, .14);
+}
+body.season-christmas .content-section {
+  border-top: 1px solid rgba(65, 145, 91, .10);
+}
+body.season-christmas .section-heading h2 {
+  text-shadow: 0 0 20px rgba(65, 145, 91, .12);
+}
+body.season-christmas::after {
+  opacity: .34;
+}
+@media (max-width: 760px) {
+  body.season-christmas .hero::before {
+    top: 65px;
+    opacity: .72;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.season-christmas .hero::before { filter: none; }
+}
