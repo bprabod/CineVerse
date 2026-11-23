@@ -81,6 +81,8 @@ function showToast(message) {
 async function loadHome() {
   const sectionTitle = $("trending").querySelector("h2");
   try {
+    // Load the saved homepage hero first so catalogue results never replace it.
+    await loadDatabaseHero();
     const [trending, popularPages, series] = await Promise.all([
       tmdb("/trending/movie/week"),
       Promise.all([1, 2, 3, 4, 5].map(page => tmdb("/movie/popular", { page: String(page) }))),
@@ -96,8 +98,7 @@ async function loadHome() {
     renderRow("trendingRow", catalogue.trending);
     renderRow("moviesRow", catalogue.movies);
     renderRow("seriesRow", catalogue.series);
-    if (catalogue.trending[0]) updateHero(catalogue.trending[0]);
-    await loadDatabaseHero();
+    // Keep the Supabase-managed hero stable; trending titles belong in the catalogue row.
   } catch (error) {
     console.error("CineVerse catalogue error:", error);
     renderRow("trendingRow", []);
