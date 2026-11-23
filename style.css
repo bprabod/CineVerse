@@ -411,25 +411,6 @@ body.season-christmas::after {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(18px, 100vh, 0); }
 }
-body.season-halloween .button-primary {
-  background: linear-gradient(110deg, #df6b2c, #9c477b);
-  box-shadow: 0 7px 24px rgba(223, 107, 44, .15);
-}
-body.season-halloween .live-dot {
-  background: #ef8a3a;
-  box-shadow: 0 0 12px rgba(239, 138, 58, .8);
-}
-body.season-halloween .site-header::after,
-body.season-halloween .detail-header::after {
-  content: "";
-  position: absolute;
-  left: 6.2%;
-  right: 6.2%;
-  bottom: 0;
-  height: 1px;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(223, 107, 44, .5), rgba(156, 71, 123, .45), transparent);
-}
 @media (prefers-reduced-motion: reduce) {
   body.season-christmas::after { animation: none; }
 }
