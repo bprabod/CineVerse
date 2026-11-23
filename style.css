@@ -414,3 +414,40 @@ body.season-christmas::after {
 @media (prefers-reduced-motion: reduce) {
   body.season-christmas::after { animation: none; }
 }
+
+
+/* Christmas polish — richer festive accents without changing the CineVerse layout. */
+body.season-christmas .site-header {
+  background: linear-gradient(180deg, rgba(8, 20, 14, .9), rgba(8, 12, 10, .42) 68%, transparent);
+}
+body.season-christmas .detail-site-header {
+  background: rgba(8, 20, 14, .96);
+  border-bottom-color: rgba(65, 145, 91, .2);
+}
+body.season-christmas .live-dot {
+  background: #42c879;
+  box-shadow: 0 0 10px rgba(66, 200, 121, .55);
+}
+body.season-christmas .button-primary {
+  background: linear-gradient(110deg, #d9273b 0%, #b51b2e 72%, #8f1728 100%);
+  box-shadow: 0 7px 25px rgba(213, 31, 50, .22), inset 0 1px 0 rgba(255,255,255,.12);
+}
+body.season-christmas .button-secondary {
+  border: 1px solid rgba(65, 145, 91, .24);
+}
+body.season-christmas .card-top {
+  background: linear-gradient(110deg, #c91f32, #8f1728);
+}
+body.season-christmas .section-kicker {
+  text-shadow: 0 0 14px rgba(55, 145, 91, .16);
+}
+body.season-christmas::after {
+  opacity: .23;
+  background-image:
+    radial-gradient(2px 2px at 18px 32px, #fff 98%, transparent),
+    radial-gradient(1.5px 1.5px at 82px 118px, #fff 98%, transparent),
+    radial-gradient(2px 2px at 145px 62px, #fff 98%, transparent),
+    radial-gradient(1.5px 1.5px at 210px 170px, #fff 98%, transparent),
+    radial-gradient(1px 1px at 48px 190px, rgba(210,255,225,.95) 98%, transparent),
+    radial-gradient(1.5px 1.5px at 232px 42px, rgba(255,220,225,.95) 98%, transparent);
+}
