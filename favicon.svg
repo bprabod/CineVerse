@@ -1,3 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 32">
-  <text x="2" y="25" fill="#ffffff" font-family="DM Sans, Arial, sans-serif" font-size="25" font-weight="800" letter-spacing="-1.4">CINE<tspan fill="#e50914">VERSE</tspan></text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#090909"/>
+  <text x="32" y="28" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="20" font-weight="900" letter-spacing="-1">CINE</text>
+  <text x="32" y="49" text-anchor="middle" fill="#e50914" font-family="Arial, sans-serif" font-size="20" font-weight="900" letter-spacing="-1">VERSE</text>
 </svg>
