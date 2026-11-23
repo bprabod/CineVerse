@@ -138,7 +138,8 @@ async function loadDatabaseHero() {
       const rows = await backgroundResponse.json();
       const featured = rows[0];
       if (featured?.backdrop_path) {
-        const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}`;
+        const imageVersion = featured.updated_at ? new Date(featured.updated_at).getTime() : Date.now();
+        const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}?v=${imageVersion}`;
         const preload = new Image();
         preload.onload = () => {
           const image = document.querySelector(".hero-image");
