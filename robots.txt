@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bprabod.github.io/CineVerse/sitemap.xml
