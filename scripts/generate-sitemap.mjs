@@ -13,23 +13,25 @@ async function tmdb(path, page = 1) {
     headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Accept: "application/json" }
   });
   if (!response.ok) throw new Error(`TMDB proxy request failed: ${path} page ${page} (${response.status})`);
-  return response.json();
+  const data = await response.json();
+  if (!Array.isArray(data.results)) throw new Error(`Unexpected TMDB response for ${path}`);
+  return data.results;
 }
 
-const entries = new Map();
-entries.set(SITE, SITE);
+const urls = new Set([SITE]);
 
 async function addTitles(path, type, pageCount) {
   const pages = await Promise.all(
     Array.from({ length: pageCount }, (_, index) => tmdb(path, index + 1))
   );
   for (const page of pages) {
-    for (const item of page.results || []) {
-      if (!item.id) continue;
+    for (const item of page) {
+      const id = Number(item.id);
+      if (!Number.isSafeInteger(id) || id <= 0) continue;
       const url = new URL("movie.html", SITE);
-      url.searchParams.set("id", String(item.id));
+      url.searchParams.set("id", String(id));
       url.searchParams.set("type", type);
-      entries.set(url.toString(), url.toString());
+      urls.add(url.toString());
     }
   }
 }
@@ -40,10 +42,24 @@ await Promise.all([
   addTitles("/tv/on_the_air", "tv", 3)
 ]);
 
-const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
-  `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  [...entries.keys()].map(url => `  <url><loc>${url}</loc></url>`).join("\n") +
-  "\n</urlset>\n";
+if (urls.size < 20) {
+  throw new Error(`Only ${urls.size - 1} title URLs collected. Keeping the existing sitemap unchanged.`);
+}
+
+const today = new Date().toISOString().slice(0, 10);
+const escapeXml = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+const xml = [
+  '<?xml version="1.0" encoding="UTF-8"?>',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  ...[...urls].map(url => [
+    "  <url>",
+    `    <loc>${escapeXml(url)}</loc>`,
+    `    <lastmod>${today}</lastmod>`,
+    "  </url>"
+  ].join("\n")),
+  "</urlset>",
+  ""
+].join("\n");
 
 await writeFile("sitemap.xml", xml, "utf8");
-console.log(`Generated sitemap with ${entries.size} URLs.`);
+console.log(`Generated sitemap with ${urls.size} URLs.`);
