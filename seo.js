@@ -34,9 +34,9 @@
     script.textContent = JSON.stringify(data);
   }
 
-  function setSocial(title, description, url, image) {
+  function setSocial(title, description, url, image, type = "website") {
     setMeta("description", description);
-    setMeta("og:type", "website", true);
+    setMeta("og:type", type, true);
     setMeta("og:site_name", "CineVerse", true);
     setMeta("og:title", title, true);
     setMeta("og:description", description, true);
@@ -69,7 +69,11 @@
     return;
   }
 
-  if (!id || !/^\d+$/.test(id)) return;
+  if (!id || !/^\d+$/.test(id)) {
+    setMeta("robots", "noindex,follow");
+    return;
+  }
+
   const detailUrl = `${SITE}movie.html?id=${encodeURIComponent(id)}&type=${type}`;
   setCanonical(detailUrl);
 
@@ -77,22 +81,35 @@
     const heading = $("detailTitle");
     const overview = $("detailOverview");
     if (!heading || !overview) return;
+
     const title = heading.textContent.trim();
     const descriptionText = overview.textContent.trim();
     if (!title || title === "Loading title…" || title === "Could not load title" || title === "Title not found") return;
+
     const yearMatch = ($("detailMeta")?.textContent || "").match(/\b(?:19|20)\d{2}\b/);
     const year = yearMatch ? yearMatch[0] : "";
     const pageTitle = `${title}${year ? ` (${year})` : ""} ${type === "tv" ? "TV Series" : "Movie"} Details | CineVerse`;
     const description = `${title}${year ? ` (${year})` : ""}: ${descriptionText}`.slice(0, 300);
     const image = $("detailPoster")?.src || "";
     document.title = pageTitle;
-    setSocial(pageTitle, description, detailUrl, image);
+    setSocial(pageTitle, description, detailUrl, image, type === "tv" ? "video.tv_show" : "video.movie");
 
-    const facts = [...document.querySelectorAll("#detailFacts .detail-fact strong")].map(node => node.textContent.trim()).filter(Boolean);
-    const actors = [...document.querySelectorAll("#castGrid .cast-card h3")].slice(0, 10).map(node => ({
-      "@type": "Person",
-      "name": node.textContent.trim()
-    }));
+    const genreFact = [...document.querySelectorAll("#detailFacts .detail-fact")].find(node =>
+      node.querySelector("span")?.textContent.trim().toUpperCase() === "GENRE"
+    );
+    const genreText = genreFact?.querySelector("strong")?.textContent.trim() || "";
+    const actors = [...document.querySelectorAll("#castGrid .cast-card h3")]
+      .slice(0, 10)
+      .map(node => ({ "@type": "Person", "name": node.textContent.trim() }))
+      .filter(person => person.name);
+    const directors = [...document.querySelectorAll("#crewList .crew-person")]
+      .filter(node => node.querySelector("span")?.textContent.trim().toLowerCase() === "director")
+      .map(node => ({
+        "@type": "Person",
+        "name": node.querySelector("strong")?.textContent.trim() || ""
+      }))
+      .filter(person => person.name);
+
     const schema = {
       "@context": "https://schema.org",
       "@type": type === "tv" ? "TVSeries" : "Movie",
@@ -101,16 +118,22 @@
       "url": detailUrl,
       ...(image ? { "image": image } : {}),
       ...(year ? { "datePublished": year } : {}),
-      ...(facts[0] ? { "genre": facts[0].split(" · ").map(value => value.trim()) } : {}),
-      ...(actors.length ? { "actor": actors } : {})
+      ...(genreText ? { "genre": genreText.split("·").map(value => value.trim()).filter(Boolean) } : {}),
+      ...(actors.length ? { "actor": actors } : {}),
+      ...(directors.length ? { "director": directors } : {})
     };
     setStructuredData(schema);
   }
 
   const observer = new MutationObserver(updateMovieMetadata);
-  for (const id of ["detailTitle", "detailOverview", "detailMeta", "detailPoster", "detailFacts", "castGrid"]) {
-    const node = $(id);
-    if (node) observer.observe(node, { childList: true, subtree: true, characterData: true, attributes: id === "detailPoster" });
+  for (const elementId of ["detailTitle", "detailOverview", "detailMeta", "detailPoster", "detailFacts", "castGrid", "crewList"]) {
+    const node = $(elementId);
+    if (node) observer.observe(node, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: elementId === "detailPoster"
+    });
   }
   updateMovieMetadata();
   window.addEventListener("load", updateMovieMetadata, { once: true });
