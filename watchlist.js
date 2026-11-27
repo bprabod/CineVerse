@@ -40,7 +40,15 @@ function escapeText(value) {
 async function getCurrentUser() {
   const { data: { user }, error } = await cvSupabase.auth.getUser();
   if (error) throw error;
-  if (!user) {\n    document.getElementById("signOut").hidden = true;\n    document.getElementById("signIn").hidden = false;\n    statusEl.textContent = "Sign in to view your Watchlist.";\n    grid.innerHTML = "";\n    return null;\n  }\n  document.getElementById("signIn").hidden = true;\n  document.getElementById("signOut").hidden = false;
+  if (!user) {
+    document.getElementById("signOut").hidden = true;
+    document.getElementById("signIn").hidden = false;
+    statusEl.textContent = "Sign in to view your Watchlist.";
+    grid.innerHTML = "";
+    return null;
+  }
+  document.getElementById("signIn").hidden = true;
+  document.getElementById("signOut").hidden = false;
   return user;
 }
 
@@ -129,4 +137,6 @@ document.getElementById("signOut").addEventListener("click", async () => {
   location.href = "index.html";
 });
 
-document.getElementById("signIn").hidden = true;\ndocument.getElementById("signOut").hidden = true;\nloadWatchlist();
+document.getElementById("signIn").hidden = true;
+document.getElementById("signOut").hidden = true;
+loadWatchlist();
