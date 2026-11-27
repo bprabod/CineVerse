@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js?v=2"></script>
   <script defer src="account-link.js?v=4"></script>
-  <script defer src="movie.js?v=watchlist-toggle-fix-3"></script>
+  <script defer src="movie.js?v=release-countdown-1"></script>
   <script data-cfasync="false" src="https://aarems.org/1/e8d627e5da08d89fdb8faad6dbb81621"></script>
 </head>
 <body class="detail-page">
@@ -37,6 +37,7 @@
       <section class="detail-copy">
         <h1 id="detailTitle">Loading title…</h1>
         <div class="hero-meta" id="detailMeta"></div>
+        <p id="releaseCountdown" class="release-countdown-detail" hidden></p>
         <p class="detail-overview" id="detailOverview">Getting title information…</p>
         <div class="detail-actions">
           <button class="button button-primary" id="playButton" type="button">▶ Watch now</button>
