@@ -492,3 +492,62 @@
   background:#292929;
   border:1px solid rgba(255,255,255,.2);
 }
+
+
+/* Responsive Watchlist grid: show saved titles as a proper collection. */
+.watchlist-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(165px,1fr));
+  gap:18px;
+  align-items:start;
+  overflow:visible;
+  padding:8px 2px 28px;
+}
+.watchlist-grid .watchlist-card{
+  min-width:0;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;
+  background:#171717;
+}
+.watchlist-grid .watchlist-poster-link{
+  display:block;
+  position:relative;
+  z-index:1;
+  min-width:0;
+  color:inherit;
+  text-decoration:none;
+}
+.watchlist-grid .poster{
+  width:100%;
+  aspect-ratio:2/2.85;
+  object-fit:cover;
+}
+.watchlist-grid .card-gradient,
+.watchlist-grid .card-info{pointer-events:none}
+.watchlist-grid .remove-title{
+  position:relative;
+  z-index:3;
+  display:block;
+  width:100%;
+  min-height:42px;
+  margin:0;
+  border:0;
+  border-top:1px solid rgba(255,255,255,.1);
+  border-radius:0;
+  background:#252525;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  pointer-events:auto;
+  touch-action:manipulation;
+}
+.watchlist-grid .remove-title:hover:not(:disabled){background:#b20d16}
+.watchlist-grid .remove-title:disabled{opacity:.65;cursor:wait}
+@media(max-width:600px){
+  .watchlist-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+}
