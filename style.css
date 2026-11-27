@@ -946,3 +946,10 @@
 .about-footer a{color:#bbb}
 .footer-links{display:flex;gap:20px}
 @media(max-width:760px){.about-header{height:68px;padding:0 5%}.about-main{padding:55px 5% 65px}.about-intro{margin-bottom:38px}.about-intro h1{letter-spacing:-2px}.about-lead{font-size:14px}.about-grid{grid-template-columns:1fr}.about-card{padding:22px}.about-footer{padding:22px 5%;flex-wrap:wrap}.footer-links{gap:14px}}
+
+
+/* Keep the shared footer at the bottom on short pages, after content on long pages. */
+html,body{min-height:100%;}
+body{min-height:100vh;display:flex;flex-direction:column;}
+body>main,body>.about-main{flex:1 0 auto;}
+body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
