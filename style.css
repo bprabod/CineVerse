@@ -790,3 +790,17 @@
 .watchlist-signin-copy{display:block;color:rgba(255,255,255,.68);font-size:13px;margin-bottom:14px}
 .watchlist-signin-link{display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:4px;background:var(--red,#e50914);color:#fff;text-decoration:none;font-size:12px;font-weight:750}
 .watchlist-signin-link:hover{filter:brightness(1.12)}
+
+
+/* Password controls: use Show/Hide text, not the legacy eye-icon styling */
+.password-field .password-visibility-toggle{
+  width:auto!important;
+  min-width:38px!important;
+  min-height:30px!important;
+  height:30px!important;
+  padding:0 4px!important;
+  font-size:12px!important;
+  line-height:1!important;
+  color:#d0d0d0!important;
+}
+.password-field .password-visibility-toggle svg{display:none!important}
