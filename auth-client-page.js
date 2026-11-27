@@ -1,5 +1,6 @@
 const $ = id => document.getElementById(id);
 let authMode = "signin";
+let showForgotPassword = false;
 const isPasswordReset = new URLSearchParams(location.search).get("mode") === "reset";
 const setMode = mode => {
  authMode = mode;
@@ -24,7 +25,7 @@ const setMode = mode => {
   ? 'Remembered your password? <a href="#signin" id="modeToggle">Sign in</a>'
   : signup
    ? 'Already have an account? <a href="#signin" id="modeToggle">Sign in</a>'
-   : '<a href="#forgot" id="forgotToggle">Forgot password?</a><br><br>New to CineVerse? <a href="#create" id="modeToggle">Create account</a>';
+   : `${showForgotPassword ? '<a class="forgot-password-action" href="#forgot" id="forgotToggle">Forgot password?</a>' : ''}<span class="auth-create-prompt">New to CineVerse? <a href="#create" id="modeToggle">Create account</a></span>`;
  $("authStatus").textContent = "";
 };
 $("modePrompt").addEventListener("click", e => {
@@ -93,6 +94,10 @@ $("authForm").addEventListener("submit", async e => {
   else $("authStatus").textContent="Account request received. Check your inbox for a confirmation email before signing in.";
  } catch(error) {
   $("authStatus").textContent = error.message || "Something went wrong. Please try again.";
+  if(authMode === "signin" && /invalid login credentials|invalid_credentials/i.test(`${error.message || ""} ${error.code || ""}`)){
+   showForgotPassword = true;
+   $("modePrompt").innerHTML = '<a class="forgot-password-action" href="#forgot" id="forgotToggle">Forgot password?</a><span class="auth-create-prompt">New to CineVerse? <a href="#create" id="modeToggle">Create account</a></span>';
+  }
  } finally {
   $("authSubmit").disabled = false;
  }
