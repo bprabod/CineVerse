@@ -259,18 +259,17 @@ dialog.addEventListener("close", () => {
   streamPlayer.hidden = true;
 });
 
-$("dialogWatch").addEventListener("click", () => {
+$("dialogWatch").addEventListener("click", async () => {
   if (!activeMovie) return;
-  const key = "cineverse-watchlist";
-  const saved = JSON.parse(localStorage.getItem(key) || "[]");
-  const exists = saved.some(item => item.id === activeMovie.id && item.type === activeMovie.type);
-  if (!exists) {
-    saved.push({ id: activeMovie.id, type: activeMovie.type, title: activeMovie.title, image: activeMovie.image });
-    localStorage.setItem(key, JSON.stringify(saved));
-    showToast(`${activeMovie.title} added to your list`);
-  } else {
-    showToast("This title is already in your list");
-  }
+  const {data:{user},error:authError}=await cvSupabase.auth.getUser();
+  if(authError||!user){location.href="auth.html";return;}
+  const {error}=await cvSupabase.from("watchlist").insert({
+    user_id:user.id,tmdb_id:activeMovie.id,media_type:activeMovie.type,
+    title:activeMovie.title,poster_url:activeMovie.image
+  });
+  if(error && error.code==="23505") showToast("This title is already in your list");
+  else if(error) showToast("Could not save title: "+error.message);
+  else showToast(`${activeMovie.title} added to your list`);
   dialog.close();
 });
 
