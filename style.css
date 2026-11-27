@@ -927,7 +927,7 @@
 
 /* About page */
 .about-page{min-height:100vh;background:radial-gradient(ellipse at 80% 0%,#351015 0%,#090909 48%)}
-.about-header{height:76px;padding:0 6.2%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#09090999}
+.about-header{height:76px;padding:0 6.2%;display:flex;align-items:center;justify-content:flex-start;gap:48px;border-bottom:1px solid var(--line);background:#09090999}.about-header .main-nav{margin-left:0;margin-right:auto}
 .about-main{max-width:1080px;margin:0 auto;padding:76px 28px 90px}
 .about-intro{max-width:760px;margin-bottom:58px}
 .about-eyebrow{color:var(--red);font-size:10px;font-weight:800;letter-spacing:2.5px;margin:0 0 18px}
