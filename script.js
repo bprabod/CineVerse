@@ -297,6 +297,23 @@ async function syncDialogWatchButton() {
   }
 }
 
+
+async function recordDialogRecentWatch(movie) {
+  try {
+    const { data: { user } } = await cvSupabase.auth.getUser();
+    if (!user || !movie) return;
+    const { error } = await cvSupabase.from("watch_history").upsert({
+      user_id: user.id,
+      tmdb_id: Number(movie.id),
+      media_type: movie.type,
+      title: movie.title,
+      poster_url: movie.image,
+      last_watched_at: new Date().toISOString()
+    }, { onConflict: "user_id,tmdb_id,media_type" });
+    if (error) console.warn("Could not save recent watch:", error);
+  } catch (error) { console.warn("Could not save recent watch:", error); }
+}
+
 async function openMovie(id, type) {
   let movie = [...catalogue.trending, ...catalogue.movies, ...catalogue.series, ...searchResults]
     .find(item => String(item.id) === String(id) && item.type === type);
@@ -345,6 +362,7 @@ $("dialogPlay").addEventListener("click", () => {
   const playerUrl = new URL(`${NEXSTREAM_EMBED}${encodeURIComponent(activeMovie.id)}`);
   playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
   streamFrame.src = playerUrl.toString();
+  recordDialogRecentWatch(activeMovie);
   streamPlayer.hidden = false;
   streamPlayer.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
