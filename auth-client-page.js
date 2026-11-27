@@ -21,11 +21,9 @@ passwordFields.forEach(id => {
  const toggle = document.createElement("button");
  toggle.type = "button";
  toggle.className = "password-visibility-toggle";
- toggle.style.cssText = "position:absolute!important;right:8px!important;top:50%!important;transform:translateY(-50%)!important;width:34px!important;height:34px!important;min-width:34px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;color:#d0d0d0!important;opacity:1!important;visibility:visible!important;z-index:20!important;cursor:pointer!important;font-size:0!important;line-height:1!important;";
- const renderEye = hidden => {
-  toggle.innerHTML = hidden
-   ? '<svg viewBox="0 0 24 24" style="display:block;width:19px;height:19px;fill:none;stroke:#d0d0d0;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a14 14 0 0 1-3 3.7"></path><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10.8 10.8 0 0 0 4-.8"></path></svg>'
-   : '<svg viewBox="0 0 24 24" style="display:block;width:19px;height:19px;fill:none;stroke:#d0d0d0;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+ toggle.style.cssText = "position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important;min-width:38px!important;height:30px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 4px!important;margin:0!important;border:0!important;background:transparent!important;color:#d0d0d0!important;opacity:1!important;visibility:visible!important;z-index:20!important;cursor:pointer!important;font-size:12px!important;font-weight:600!important;line-height:1!important;";
+ const renderEye =  toggle.textContent = hidden ? "Hide" : "Show";
+cle></svg>';
  };
  renderEye(false);
  toggle.setAttribute("aria-label", "Show password");
