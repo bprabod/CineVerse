@@ -856,7 +856,7 @@
 /* Responsive Adsterra Native Banner placement */
 .cv-native-ad{
   box-sizing:border-box;
-  width:min(300px, calc(100% - 24px));
+  width:min(1000px, calc(100% - 32px));
   margin:16px auto 20px;
   padding:0;
   color:rgba(255,255,255,.38);
@@ -870,10 +870,8 @@
   margin:0 0 5px;
 }
 #container-6e2d91a6ad04321640ed7203cf20f430{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:300px;
+  display:block;
+  width:100%;
   max-width:100%;
   min-width:0;
   min-height:0;
