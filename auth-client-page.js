@@ -109,6 +109,14 @@ $("authForm").addEventListener("submit", async e => {
    location.href = "account.html";
    return;
   }
+  const {data: existingUsername, error: usernameCheckError} = await cvSupabase
+   .from("profiles").select("username").ilike("username", username).maybeSingle();
+  if(usernameCheckError) throw usernameCheckError;
+  if(existingUsername){
+   $("authStatus").textContent = "That username is already taken. Please choose another one.";
+   $("username").focus();
+   return;
+  }
   const {data,error} = await cvSupabase.auth.signUp({
    email,password,
    options:{
@@ -126,7 +134,10 @@ $("authForm").addEventListener("submit", async e => {
   if(data.session){$("authStatus").textContent="Account created. Opening your account…";location.href="account.html";}
   else $("authStatus").textContent="Account request received. Check your inbox for a confirmation email before signing in.";
  } catch(error) {
-  $("authStatus").textContent = /session missing/i.test(error.message || "") ? "Please sign in to continue." : (error.message || "Something went wrong. Please try again.");
+  const message = error.message || "";
+  $("authStatus").textContent = /profiles_username_unique_idx|duplicate key.*username/i.test(message)
+   ? "That username is already taken. Please choose another one."
+   : /session missing/i.test(message) ? "Please sign in to continue." : (message || "Something went wrong. Please try again.");
   if(authMode === "signin"){
    showForgotPassword = true;
    $("modePrompt").innerHTML = '<a class="forgot-password-action" href="#forgot" id="forgotToggle">Forgot password?</a><span class="auth-create-prompt">New to CineVerse? <a href="#create" id="modeToggle">Create account</a></span>';
