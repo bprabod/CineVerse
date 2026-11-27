@@ -8,23 +8,47 @@
   <link rel="icon" href="favicon.svg?v=6">
   <link rel="stylesheet" href="style.css?v=mobile-ad-layout-1">
   <style>
-    /* Compact, balanced layout for the account page only. */
-    .account-page .account-main{width:min(100% - 40px,760px);max-width:760px;margin:0 auto;padding:48px 0 76px}
-    .account-page .account-main>h1{font-size:clamp(32px,4vw,44px)!important;letter-spacing:-1.5px}
-    .account-page .account-main>.detail-overview{max-width:590px;font-size:13px;line-height:1.75;color:#aaa}
-    .account-page .account-summary-card{width:100%;max-width:680px;padding:22px 24px!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:10px!important;background:linear-gradient(135deg,#191919,#111)!important}
-    .account-page .account-summary-card #accountUsername{font-size:20px!important;margin:6px 0 16px!important}
-    .account-page .account-summary-card #accountEmail{font-size:13px!important;margin:6px 0 18px!important}
-    .account-page .account-summary-card .detail-actions{margin-top:4px}
-    .account-page .account-danger-zone{max-width:680px;margin:24px auto 0;padding:19px 22px;gap:18px;border-radius:9px}
+    /* Netflix-inspired account dashboard, scoped to this page. */
+    .account-page{background:#080808;background-image:radial-gradient(ellipse at 50% 0%,rgba(120,12,20,.22),transparent 42%)}
+    .account-page .member-site-header{position:relative;background:rgba(5,5,5,.94);border-bottom:1px solid rgba(255,255,255,.09);backdrop-filter:blur(14px)}
+    .account-page .account-main{width:min(100% - 48px,980px);max-width:980px;margin:0 auto;padding:54px 0 82px}
+    .account-page .account-kicker{color:#e50914;font-size:10px;font-weight:800;letter-spacing:2.6px;margin:0 0 10px}
+    .account-page .account-title{font-size:clamp(34px,5vw,48px);letter-spacing:-2px;line-height:1.05;margin:0 0 10px}
+    .account-page .account-subtitle{max-width:620px;margin:0 0 30px;color:#a8a8a8;font-size:13px;line-height:1.75}
+    .account-page .account-summary-card{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:22px;width:100%;padding:26px 28px!important;border:1px solid rgba(255,255,255,.11)!important;border-radius:12px!important;background:linear-gradient(110deg,#202020 0%,#151515 58%,#101010 100%)!important;box-shadow:0 18px 55px rgba(0,0,0,.25);overflow:hidden}
+    .account-page .account-summary-card:after{content:"";position:absolute;right:-80px;top:-120px;width:260px;height:260px;border-radius:50%;background:rgba(229,9,20,.13);filter:blur(55px);pointer-events:none}
+    .account-page .account-avatar{position:relative;z-index:1;width:68px;height:68px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(145deg,#e50914,#710b12);box-shadow:0 8px 24px rgba(229,9,20,.2)}
+    .account-page .account-avatar svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .account-page .account-identity{position:relative;z-index:1;min-width:0}
+    .account-page .account-identity .section-kicker{margin:0 0 5px;color:#aaa}
+    .account-page .account-identity #accountUsername{font-size:22px!important;line-height:1.2;overflow-wrap:anywhere;margin:0 0 10px!important}
+    .account-page .account-identity #accountEmail{font-size:12px!important;color:#aaa!important;overflow-wrap:anywhere;margin:0!important}
+    .account-page .account-summary-card .detail-actions{position:relative;z-index:1;margin:0}
+    .account-page .account-summary-card .button{white-space:nowrap;min-height:42px;padding:11px 17px;border-radius:5px}
+    .account-page #accountStatus{grid-column:2/-1;margin:0}
+    .account-page .recent-history-section{margin:42px 0 34px}
+    .account-page .recent-history-heading h2{font-size:25px;letter-spacing:-.7px}
+    .account-page .account-danger-zone{max-width:none;margin:32px 0 0;padding:22px 24px;gap:20px;border:1px solid rgba(255,255,255,.12);border-left:3px solid #8f1018;border-radius:8px;background:linear-gradient(110deg,rgba(255,255,255,.055),rgba(18,18,18,.92) 65%)}
     .account-page .account-danger-zone h2{font-size:17px}
-    .account-page .account-danger-copy{max-width:390px;font-size:11px}
+    .account-page .account-danger-copy{max-width:480px;font-size:11px}
     .account-page .account-danger-zone .account-delete-button{flex:0 0 auto;padding:10px 15px;font-size:11px}
-    @media(max-width:560px){
-      .account-page .account-main{width:calc(100% - 32px);padding:34px 0 58px}
-      .account-page .account-summary-card{padding:19px!important}
+    @media(max-width:650px){
+      .account-page .member-site-header{height:auto;min-height:66px;padding:12px 5%;gap:12px}
+      .account-page .member-site-header .main-nav{overflow-x:auto;white-space:nowrap;min-width:0;gap:13px}
+      .account-page .account-main{width:calc(100% - 32px);padding:38px 0 60px}
+      .account-page .account-summary-card{grid-template-columns:52px minmax(0,1fr);gap:14px;padding:19px!important}
+      .account-page .account-avatar{width:52px;height:52px;border-radius:8px}
+      .account-page .account-avatar svg{width:27px;height:27px}
+      .account-page .account-identity #accountUsername{font-size:18px!important}
+      .account-page .account-summary-card .detail-actions{grid-column:1/-1}
+      .account-page .account-summary-card .detail-actions .button{width:100%}
+      .account-page #accountStatus{grid-column:1/-1}
+      .account-page .recent-history-section{margin:34px 0 28px}
+      .account-page .recent-history-heading h2{font-size:22px}
       .account-page .account-danger-zone{padding:18px;gap:14px}
+      .account-page .account-danger-zone .account-delete-button{width:100%}
     }
+    @media(max-width:390px){.account-page .member-site-header{flex-wrap:wrap}.account-page .member-site-header .main-nav{order:3;flex-basis:100%;padding:3px 0 5px}.account-page .member-site-header .header-actions{margin-left:auto}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js"></script>
@@ -38,14 +62,17 @@
     <div class="header-actions"><button class="button button-secondary" id="signOut" type="button">Sign out</button></div>
   </header>
   <main class="detail-main account-main">
-    <p class="section-kicker">CINEVERSE MEMBER AREA</p>
-    <h1 style="font-size:clamp(34px,5vw,52px);margin:0 0 12px">Your account</h1>
-    <p class="detail-overview" style="margin:0 0 28px">Welcome to your CineVerse account. Your saved movies and series are ready whenever you are.</p>
-    <section class="account-summary-card">
-      <p class="section-kicker">YOUR USERNAME</p>
-      <h2 id="accountUsername" style="font-size:22px;overflow-wrap:anywhere;margin:8px 0 18px">Loading…</h2>
-      <p class="section-kicker">SIGNED IN WITH</p>
-      <p id="accountEmail" style="font-size:14px;color:#bbb;overflow-wrap:anywhere;margin:8px 0 22px">Checking your account…</p>
+    <p class="account-kicker">CINEVERSE MEMBER AREA</p>
+    <h1 class="account-title">Account</h1>
+    <p class="account-subtitle">Manage your profile, keep track of what you have watched, and get back to the stories you love.</p>
+    <section class="account-summary-card" aria-label="Account details">
+      <div class="account-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.8-3.4 3.2-5 7-5s6.2 1.6 7 5"></path></svg></div>
+      <div class="account-identity">
+        <p class="section-kicker">YOUR PROFILE</p>
+        <h2 id="accountUsername">Loading…</h2>
+        <p class="section-kicker">SIGNED IN WITH</p>
+        <p id="accountEmail">Checking your account…</p>
+      </div>
       <div class="detail-actions">
         <a class="button button-primary" href="watchlist.html">Open Watchlist</a>
       </div>
