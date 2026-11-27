@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090909"><meta name="robots" content="noindex,follow">
   <title>My Account | CineVerse</title>
   <link rel="icon" href="favicon.svg?v=6">
-  <link rel="stylesheet" href="style.css?v=mobile-ad-layout-1">
+  <link rel="stylesheet" href="style.css?v=profile-reviews-1">
   <style>
     /* Netflix-inspired account dashboard, scoped to this page. */
     .account-page{background:#080808;background-image:radial-gradient(ellipse at 50% 0%,rgba(120,12,20,.22),transparent 42%)}
@@ -52,7 +52,7 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js"></script>
-  <script defer src="account.js?v=6"></script>
+  <script defer src="account.js?v=profile-reviews-1"></script>
   <script defer src="native-ads.js?v=mobile-ad-layout-1"></script>
 </head>
 <body class="detail-page account-page">
@@ -86,6 +86,16 @@
       </div>
       <div id="recentHistoryList" class="recent-history-list" aria-live="polite">
         <p class="recent-history-empty">Loading your recent films…</p>
+      </div>
+    </section>
+
+    <section class="profile-reviews-section" aria-labelledby="profileReviewsHeading">
+      <div class="profile-reviews-heading">
+        <div><p class="section-kicker">YOUR ACTIVITY</p><h2 id="profileReviewsHeading">Your Reviews</h2></div>
+        <span class="profile-reviews-count" id="profileReviewsCount">—</span>
+      </div>
+      <div class="profile-reviews-list" id="profileReviewsList" aria-live="polite">
+        <p class="profile-reviews-empty">Loading your reviews…</p>
       </div>
     </section>
 
