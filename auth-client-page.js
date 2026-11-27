@@ -9,6 +9,6 @@ $("signUp").addEventListener("click", async () => {
  $("authStatus").textContent="Creating account…";
  const {data,error}=await cvSupabase.auth.signUp({email:$("email").value.trim(),password:$("password").value,options:{emailRedirectTo:location.origin+location.pathname.replace("auth.html","account.html")}});
  if(error){$("authStatus").textContent=error.message;return;}
- $("authStatus").textContent=data.session?"Account created. Opening your list…":"Check your email to confirm your account, then sign in.";
+ $("authStatus").textContent=data.session?"Account created. Opening your account…":"Check your email to confirm your account, then sign in.";
  if(data.session) location.href="account.html";
 });
