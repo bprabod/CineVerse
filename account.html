@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#090909">
   <title>My Account | CineVerse</title>
   <link rel="icon" href="favicon.svg?v=6">
-  <link rel="stylesheet" href="style.css?v=account-delete-1">
+  <link rel="stylesheet" href="style.css?v=recent-history-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js"></script>
-  <script defer src="account.js?v=4"></script>
+  <script defer src="account.js?v=5"></script>
 </head>
 <body class="detail-page">
   <header class="site-header member-site-header">
@@ -30,6 +30,16 @@
         <a class="button button-primary" href="watchlist.html">Open Watchlist</a>
       </div>
       <p id="accountStatus" class="detail-status" role="status"></p>
+    </section>
+
+    <section class="recent-history-section" aria-labelledby="recentHistoryHeading">
+      <div class="recent-history-heading">
+        <div><p class="section-kicker">YOUR ACTIVITY</p><h2 id="recentHistoryHeading">Recently Watched</h2></div>
+        <span class="recent-history-note">LATEST 20</span>
+      </div>
+      <div id="recentHistoryList" class="recent-history-list" aria-live="polite">
+        <p class="recent-history-empty">Loading your recent films…</p>
+      </div>
     </section>
 
     <section class="account-danger-zone" aria-labelledby="deleteAccountHeading">
