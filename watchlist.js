@@ -18,29 +18,42 @@ const grid = document.getElementById("savedTitles");
   statusEl.textContent = "";
   grid.innerHTML = items.map(item => `
     <article class="movie-card watchlist-card">
-      <a href="movie.html?id=${encodeURIComponent(item.tmdb_id)}&type=${encodeURIComponent(item.media_type)}">
+      <a class="watchlist-poster-link" href="movie.html?id=${encodeURIComponent(item.tmdb_id)}&type=${encodeURIComponent(item.media_type)}">
         <img class="poster" loading="lazy" src="${escapeText(item.poster_url || "https://placehold.co/500x750/171717/eeeeee?text=CineVerse")}" alt="Poster for ${escapeText(item.title)}">
         <div class="card-gradient"></div><div class="card-info">
           <h3>${escapeText(item.title)}</h3><p>${item.media_type === "tv" ? "TV Series" : "Movie"}</p>
         </div>
       </a>
       <button class="button button-secondary remove-title" data-id="${escapeText(item.id)}" type="button"
-        aria-label="Delete ${escapeText(item.title)} from Watchlist" style="width:100%;border-radius:0">Delete</button>
+        aria-label="Remove ${escapeText(item.title)} from Watchlist">Remove</button>
     </article>`).join("");
-
-  grid.querySelectorAll(".remove-title").forEach(button => button.addEventListener("click", async () => {
-    if (button.disabled || !window.confirm("Delete this title from your Watchlist?")) return;
-    button.disabled = true; button.textContent = "Deleting…";
-    const { error: deleteError } = await cvSupabase.from("watchlist").delete()
-      .eq("id", button.dataset.id).eq("user_id", user.id);
-    if (deleteError) {
-      statusEl.textContent = "Could not delete title: " + deleteError.message;
-      button.disabled = false; button.textContent = "Delete"; return;
-    }
-    button.closest(".watchlist-card").remove();
-    if (!grid.children.length) statusEl.textContent = "Your Watchlist is empty.";
-  }));
 })();
+
+grid.addEventListener("click", async event => {
+  const button = event.target.closest(".remove-title");
+  if (!button || button.disabled) return;
+  event.preventDefault();
+  event.stopPropagation();
+  button.disabled = true;
+  button.textContent = "Removing…";
+  statusEl.textContent = "";
+
+  const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
+  if (authError || !user) { location.href = "auth.html"; return; }
+
+  const { data, error } = await cvSupabase.from("watchlist").delete()
+    .eq("id", button.dataset.id).eq("user_id", user.id).select("id").maybeSingle();
+
+  if (error || !data) {
+    statusEl.textContent = "Could not remove this title. " + (error?.message || "Refresh and try again.");
+    button.disabled = false;
+    button.textContent = "Remove";
+    return;
+  }
+
+  button.closest(".watchlist-card")?.remove();
+  if (!grid.querySelector(".watchlist-card")) statusEl.textContent = "Your Watchlist is empty.";
+});
 
 function escapeText(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({

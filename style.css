@@ -451,3 +451,44 @@
     line-height:1.05;letter-spacing:-1.5px;max-width:100%;
   }
 }
+
+
+/* Keep Watchlist actions above the poster link so they are always tappable. */
+.watchlist-card > .watchlist-poster-link{
+  display:block;
+  position:relative;
+  z-index:1;
+}
+.watchlist-card .card-gradient,
+.watchlist-card .card-info{
+  pointer-events:none;
+}
+.watchlist-card > .remove-title{
+  position:relative;
+  z-index:4;
+  display:block;
+  width:100%;
+  min-height:42px;
+  margin:0;
+  border:0;
+  border-top:1px solid rgba(255,255,255,.1);
+  border-radius:0;
+  background:#252525;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  pointer-events:auto;
+  touch-action:manipulation;
+}
+.watchlist-card > .remove-title:hover:not(:disabled){
+  background:#b20d16;
+}
+.watchlist-card > .remove-title:disabled{
+  opacity:.65;
+  cursor:wait;
+}
+.button.watchlist-saved{
+  background:#292929;
+  border:1px solid rgba(255,255,255,.2);
+}

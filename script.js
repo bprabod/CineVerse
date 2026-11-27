@@ -244,18 +244,23 @@ heroControls?.addEventListener('mouseleave', startHeroAutoplay);
 
 const dialog = $("movieDialog");
 
+let dialogWatchlistEntryId = null;
 async function syncDialogWatchButton() {
   const button = $("dialogWatch");
   button.disabled = true; button.textContent = "Checking…";
   try {
     const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
     if (authError) throw authError;
-    if (!user) { button.disabled = false; button.textContent = "＋ Add to Watchlist"; return; }
+    if (!user) {
+      dialogWatchlistEntryId = null;
+      button.disabled = false; button.textContent = "＋ Add to Watchlist"; return;
+    }
     const { data, error } = await cvSupabase.from("watchlist").select("id")
       .eq("user_id", user.id).eq("tmdb_id", Number(activeMovie.id)).eq("media_type", activeMovie.type).maybeSingle();
     if (error) throw error;
-    button.disabled = Boolean(data);
-    button.textContent = data ? "✓ In Watchlist" : "＋ Add to Watchlist";
+    dialogWatchlistEntryId = data?.id || null;
+    button.disabled = false;
+    button.textContent = data ? "✓ In Watchlist · Remove" : "＋ Add to Watchlist";
   } catch (error) {
     console.warn("Could not check Watchlist status:", error);
     button.disabled = false; button.textContent = "＋ Add to Watchlist";
@@ -272,7 +277,8 @@ async function openMovie(id, type) {
   $("dialogDescription").textContent = movie.description;
   $("dialogArt").style.backgroundImage = `linear-gradient(0deg,#14141400,#0005),url("${movie.backdrop}")`;
   $("dialogMeta").innerHTML = `<span class="match">★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span class="rating">TMDB</span>`;
-  $("dialogWatch").textContent = "＋ Add to my list";
+  dialogWatchlistEntryId = null;
+  $("dialogWatch").textContent = "＋ Add to Watchlist";
   try {
     const detail = await tmdb(`/${type}/${id}`);
     movie = { ...movie, description: detail.overview || movie.description,
@@ -324,9 +330,25 @@ dialog.addEventListener("close", () => {
 $("dialogWatch").addEventListener("click", async () => {
   const button = $("dialogWatch");
   if (!activeMovie || button.disabled) return;
-  button.disabled = true; button.textContent = "Saving…";
+  button.disabled = true;
   const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
   if (authError || !user) { location.href = "auth.html"; return; }
+
+  if (dialogWatchlistEntryId) {
+    button.textContent = "Removing…";
+    const { data, error } = await cvSupabase.from("watchlist").delete()
+      .eq("id", dialogWatchlistEntryId).eq("user_id", user.id).select("id").maybeSingle();
+    if (error || !data) {
+      showToast("Could not remove this title from your Watchlist.");
+      button.disabled = false; button.textContent = "✓ In Watchlist · Remove"; return;
+    }
+    dialogWatchlistEntryId = null;
+    button.disabled = false; button.textContent = "＋ Add to Watchlist";
+    showToast(`${activeMovie.title} removed from your Watchlist.`);
+    return;
+  }
+
+  button.textContent = "Saving…";
   const { error } = await cvSupabase.from("watchlist").insert({
     user_id: user.id, tmdb_id: activeMovie.id, media_type: activeMovie.type,
     title: activeMovie.title, poster_url: activeMovie.image
@@ -335,8 +357,8 @@ $("dialogWatch").addEventListener("click", async () => {
     showToast("Could not save title: " + error.message);
     button.disabled = false; button.textContent = "＋ Add to Watchlist"; return;
   }
+  await syncDialogWatchButton();
   showToast(error ? "This title is already in your Watchlist." : `${activeMovie.title} added to your Watchlist.`);
-  button.disabled = true; button.textContent = "✓ In Watchlist";
 });
 
 document.querySelectorAll("[data-scroll]").forEach(button => {

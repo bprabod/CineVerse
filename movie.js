@@ -97,18 +97,25 @@ function renderExtraDetails(item) {
   }
 }
 
+let detailWatchlistEntryId = null;
 async function syncDetailWatchlistButton() {
   const button = $("listButton");
   button.disabled = true; button.textContent = "Checking…";
   try {
     const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
     if (authError) throw authError;
-    if (!user) { button.disabled = false; button.textContent = "＋ Add to Watchlist"; return; }
+    if (!user) {
+      detailWatchlistEntryId = null;
+      button.disabled = false; button.textContent = "＋ Add to Watchlist";
+      return;
+    }
     const { data, error } = await cvSupabase.from("watchlist").select("id")
       .eq("user_id", user.id).eq("tmdb_id", Number(id)).eq("media_type", type).maybeSingle();
     if (error) throw error;
-    button.disabled = Boolean(data);
-    button.textContent = data ? "✓ In Watchlist" : "＋ Add to Watchlist";
+    detailWatchlistEntryId = data?.id || null;
+    button.disabled = false;
+    button.textContent = data ? "✓ In Watchlist · Remove" : "＋ Add to Watchlist";
+    button.classList.toggle("watchlist-saved", Boolean(data));
   } catch (error) {
     console.warn("Could not check Watchlist status:", error);
     button.disabled = false; button.textContent = "＋ Add to Watchlist";
@@ -245,9 +252,27 @@ $("stopButton").addEventListener("click", () => {
 $("listButton").addEventListener("click", async () => {
   const button = $("listButton");
   if (!currentTitle || button.disabled) return;
-  button.disabled = true; button.textContent = "Saving…";
+  button.disabled = true;
   const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
   if (authError || !user) { location.href = "auth.html"; return; }
+
+  if (detailWatchlistEntryId) {
+    button.textContent = "Removing…";
+    const { data, error } = await cvSupabase.from("watchlist").delete()
+      .eq("id", detailWatchlistEntryId).eq("user_id", user.id).select("id").maybeSingle();
+    if (error || !data) {
+      $("detailStatus").textContent = "Could not remove this title from your Watchlist." + (error ? " " + error.message : " Please refresh and try again.");
+      button.disabled = false; button.textContent = "✓ In Watchlist · Remove";
+      return;
+    }
+    detailWatchlistEntryId = null;
+    $("detailStatus").textContent = (currentTitle.title || currentTitle.name || "Title") + " removed from your Watchlist.";
+    button.disabled = false; button.textContent = "＋ Add to Watchlist";
+    button.classList.remove("watchlist-saved");
+    return;
+  }
+
+  button.textContent = "Saving…";
   const title = currentTitle.title || currentTitle.name || "Untitled";
   const poster = currentTitle.poster_path ? `${IMAGE_BASE}w500${currentTitle.poster_path}` : posterFallback;
   const { error } = await cvSupabase.from("watchlist").insert({
@@ -257,8 +282,8 @@ $("listButton").addEventListener("click", async () => {
     $("detailStatus").textContent = "Could not save title: " + error.message;
     button.disabled = false; button.textContent = "＋ Add to Watchlist"; return;
   }
+  await syncDetailWatchlistButton();
   $("detailStatus").textContent = error ? "This title is already in your Watchlist." : title + " added to your Watchlist.";
-  button.disabled = true; button.textContent = "✓ In Watchlist";
 });
 
 window.addEventListener("pagehide", () => { $("playerFrame").src = "about:blank"; });
