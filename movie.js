@@ -277,6 +277,8 @@ $("toggleReviews").addEventListener("click", () => {
 });
 
 $("writeReviewButton").addEventListener("click", () => {
+  const compose = $("reviewCompose");
+  compose.hidden = false;
   if (!reviewUser) {
     $("reviewGuestPrompt").hidden = false;
     $("reviewGuestPrompt").scrollIntoView({behavior:"smooth",block:"center"});
@@ -353,6 +355,7 @@ $("reviewsList").addEventListener("click", async event => {
   if (!review) return;
   if (button.dataset.reviewAction === "edit") {
     if ($("reviewsPanel").hidden) $("toggleReviews").click();
+    $("reviewCompose").hidden = false;
     editingReviewId = review.id;
     $("reviewFormHeading").textContent = "Edit your review";
     $("submitReview").textContent = "Save changes";
