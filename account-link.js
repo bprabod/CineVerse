@@ -1,6 +1,6 @@
 (() => {
  const link = document.getElementById("accountLink");
- if (!link || !window.cvSupabase) return;
+ if (!link || typeof cvSupabase === "undefined") return;
 
  const setDestination = session => {
   const signedIn = Boolean(session?.user);
