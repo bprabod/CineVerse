@@ -73,6 +73,7 @@ async function loadAdminDashboard(user) {
     return;
   }
 
+  document.body.classList.remove("admin-locked");
   adminStatus.textContent = "Administrator access verified.";
   adminStats.hidden = false;
   adminTools.hidden = false;
