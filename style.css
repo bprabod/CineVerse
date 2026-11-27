@@ -396,3 +396,18 @@
  .member-site-header .main-nav{grid-column:1/-1;grid-row:2;width:100%;overflow-x:auto;gap:22px;padding:0 0 10px;font-size:11px;scrollbar-width:none}
  .member-site-header .main-nav::-webkit-scrollbar{display:none}
 }
+
+
+/* Center the member-page tabs while keeping the brand and actions aligned */
+.member-site-header{
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+}
+.member-site-header .brand{justify-self:start}
+.member-site-header .main-nav{justify-self:center}
+.member-site-header .header-actions{justify-self:end}
+@media(max-width:760px){
+  .member-site-header{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:58px 42px}
+  .member-site-header .brand{justify-self:start}
+  .member-site-header .header-actions{justify-self:end}
+  .member-site-header .main-nav{justify-self:start}
+}
