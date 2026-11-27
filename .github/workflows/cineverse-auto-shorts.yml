@@ -35,15 +35,13 @@ jobs:
           sudo apt-get install -y ffmpeg fonts-dejavu-core
       - name: Install dependencies
         run: pip install -r automation/requirements.txt
-      - name: Create and publish original Shorts
+      - name: Create and publish movie-scene Shorts
         working-directory: automation
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           MAX_UPLOADS_PER_RUN: "2"
         run: python create_shorts.py
       - name: Save processed IDs
