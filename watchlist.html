@@ -2,4 +2,12 @@
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex,follow"><title>Watchlist | CineVerse</title><link rel="icon" href="favicon.svg?v=6"><link rel="stylesheet" href="style.css?v=native-wide-4"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="auth-client.js"></script><script defer src="watchlist.js?v=all-password-eyes-guest-notice-1"></script>  <script defer src="native-ads.js?v=4"></script>
 </head>
 <body><header class="site-header member-site-header"><a class="brand" href="index.html">CINE<span>VERSE</span></a><nav class="main-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="index.html#trending">Discover</a><a href="index.html#movies">Movies</a><a href="index.html#series">Series</a><a href="watchlist.html" class="active">Watchlist</a></nav><div class="header-actions"><a class="button button-secondary" id="signIn" href="auth.html">Sign in</a><button class="button button-secondary" id="signOut" type="button" hidden>Sign out</button></div></header>
-<main class="content-section" style="min-height:75vh;padding-top:55px"><p class="section-kicker">YOUR WATCHLIST</p><div class="section-heading"><h2>Watchlist</h2></div><p id="listStatus" class="detail-status">Loading your list…</p><div id="savedTitles" class="watchlist-grid"></div></main></body></html>
+<main class="content-section" style="min-height:75vh;padding-top:55px"><p class="section-kicker">YOUR WATCHLIST</p><div class="section-heading"><h2>Watchlist</h2></div><p id="listStatus" class="detail-status">Loading your list…</p><div id="savedTitles" class="watchlist-grid"></div></main><footer class="site-footer">
+  <a class="brand" href="index.html">CINE<span>VERSE</span></a>
+  <p>A universe of stories. A world of discovery.</p>
+  <div class="footer-bottom">
+    <span>© <span class="cineverse-year"></span> CineVerse. Made for movie lovers.</span>
+    <div class="footer-links"><a href="about.html">About CineVerse</a><a href="index.html#top">Back to top ↑</a></div>
+  </div>
+</footer>
+<script>document.querySelectorAll(".cineverse-year").forEach(el => el.textContent = new Date().getFullYear());</script></body></html>
