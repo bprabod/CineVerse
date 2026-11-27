@@ -115,6 +115,24 @@ function escapeHistoryHtml(value) {
     usernameEl.textContent = username || "CineVerse member";
     emailEl.textContent = user.email || "Email unavailable";
     statusEl.textContent = "Your account is active.";
+    try {
+      const { data: adminGrant, error: adminGrantError } = await cvSupabase
+        .from("cineverse_admins").select("user_id").eq("user_id", user.id).maybeSingle();
+      if (adminGrantError) throw adminGrantError;
+      if (adminGrant) {
+        const headerActions = document.querySelector(".account-page .header-actions");
+        if (headerActions && !document.getElementById("adminPanelLink")) {
+          const adminLink = document.createElement("a");
+          adminLink.id = "adminPanelLink";
+          adminLink.className = "button button-secondary";
+          adminLink.href = "admin.html";
+          adminLink.textContent = "Admin Panel";
+          headerActions.insertBefore(adminLink, signOutButton);
+        }
+      }
+    } catch (adminCheckError) {
+      console.warn("Could not check CineVerse admin access:", adminCheckError);
+    }
     await loadRecentHistory(user.id);
     await loadProfileReviews(user.id);
   } catch (error) {
