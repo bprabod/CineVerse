@@ -43,6 +43,7 @@ const setMode = mode => {
  $("newPassword").required = reset;
  $("confirmNewPassword").hidden = !reset;
  $("confirmNewPassword").required = reset;
+ passwordFields.forEach(id => { const input = $(id); input.closest(".password-field").hidden = input.hidden; });
  $("password").setAttribute("autocomplete", signup || reset ? "new-password" : "current-password");
  $("modePrompt").innerHTML = reset || forgot
   ? 'Remembered your password? <a href="#signin" id="modeToggle">Sign in</a>'
