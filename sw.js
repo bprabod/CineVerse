@@ -1,5 +1,5 @@
 /* CineVerse offline + repeat-visit cache. Bump CACHE_VERSION when changing cache rules. */
-const CACHE_VERSION = "cineverse-v12";
+const CACHE_VERSION = "cineverse-v13";
 const CORE_CACHE = `${CACHE_VERSION}-core`;
 const PAGE_CACHE = `${CACHE_VERSION}-pages`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
