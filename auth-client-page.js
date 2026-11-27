@@ -22,9 +22,7 @@ passwordFields.forEach(id => {
  toggle.type = "button";
  toggle.className = "password-visibility-toggle";
  toggle.style.cssText = "position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important;min-width:38px!important;height:30px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 4px!important;margin:0!important;border:0!important;background:transparent!important;color:#d0d0d0!important;opacity:1!important;visibility:visible!important;z-index:20!important;cursor:pointer!important;font-size:12px!important;font-weight:600!important;line-height:1!important;";
- const renderEye =  toggle.textContent = hidden ? "Hide" : "Show";
-cle></svg>';
- };
+ const renderEye = hidden => { toggle.textContent = hidden ? "Hide" : "Show"; };
  renderEye(false);
  toggle.setAttribute("aria-label", "Show password");
  toggle.setAttribute("aria-pressed", "false");
