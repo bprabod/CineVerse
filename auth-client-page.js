@@ -31,7 +31,7 @@ $("modePrompt").addEventListener("click", e => {
  if(e.target.id === "forgotToggle"){ e.preventDefault(); setMode("forgot"); return; }
  if(e.target.id !== "modeToggle") return;
  e.preventDefault();
- setMode("signin");
+ setMode(e.target.getAttribute("href") === "#create" ? "signup" : "signin");
 });
 $("authForm").addEventListener("submit", async e => {
  e.preventDefault();
