@@ -374,3 +374,7 @@
 .detail-frame-wrap:fullscreen iframe,
 .detail-frame-wrap:-webkit-full-screen iframe{width:100%;height:100%;border:0}
 @media(max-width:480px){.player-controls{gap:8px}}
+
+/* Make the sign-up mode link clearly visible on the auth page */
+#modePrompt a{color:#ff4b55;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;font-weight:700;cursor:pointer;transition:color .2s ease}
+#modePrompt a:hover,#modePrompt a:focus-visible{color:#fff;text-decoration-thickness:2px;outline-offset:3px}
