@@ -110,7 +110,7 @@ async function syncDetailWatchlistButton() {
       return;
     }
     const { data, error } = await cvSupabase.from("watchlist").select("id")
-      .eq("user_id", user.id).eq("tmdb_id", Number(id)).eq("media_type", type).maybeSingle();
+      .eq("user_id", user.id).eq("tmdb_id", Number(id)).eq("media_type", type).limit(1).maybeSingle();
     if (error) throw error;
     detailWatchlistEntryId = data?.id || null;
     button.disabled = false;
@@ -258,10 +258,14 @@ $("listButton").addEventListener("click", async () => {
 
   if (detailWatchlistEntryId) {
     button.textContent = "Removing…";
-    const { data, error } = await cvSupabase.from("watchlist").delete()
-      .eq("id", detailWatchlistEntryId).eq("user_id", user.id).select("id").maybeSingle();
-    if (error || !data) {
-      $("detailStatus").textContent = "Could not remove this title from your Watchlist." + (error ? " " + error.message : " Please refresh and try again.");
+    const entryId = detailWatchlistEntryId;
+    const { error } = await cvSupabase.from("watchlist").delete()
+      .eq("id", entryId).eq("user_id", user.id);
+    const { data: remaining, error: checkError } = await cvSupabase.from("watchlist")
+      .select("id").eq("id", entryId).eq("user_id", user.id).limit(1).maybeSingle();
+    if (error || checkError || remaining) {
+      const reason = error || checkError;
+      $("detailStatus").textContent = "Could not remove this title from your Watchlist." + (reason ? " " + reason.message : " Please refresh and try again.");
       button.disabled = false; button.textContent = "✓ In Watchlist · Remove";
       return;
     }
