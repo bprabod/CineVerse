@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Admin Dashboard | CineVerse</title>
   <link rel="icon" href="favicon.svg?v=6">
-  <link rel="stylesheet" href="style.css?v=admin-panel-1">
+  <link rel="stylesheet" href="style.css?v=admin-tools-2">
   <style>
     .admin-page{min-height:100vh;background:#080808;background-image:radial-gradient(ellipse at 50% 0%,rgba(130,10,20,.2),transparent 44%)}
     .admin-header{position:relative;background:rgba(5,5,5,.94);border-bottom:1px solid rgba(255,255,255,.09);backdrop-filter:blur(14px)}
@@ -31,13 +31,28 @@
     .admin-review-meta{display:block;margin-top:5px;color:#888;font-size:10px}
     .admin-review-text{margin:9px 0 0;color:#bbb;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
     .admin-review-rating{flex-shrink:0;color:#f5bd42;font-size:12px;white-space:nowrap}
+    .admin-tools{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:34px}
+    .admin-panel{min-width:0;padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.025)}
+    .admin-panel h2{margin:0;font-size:20px}
+    .admin-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .admin-panel-note{color:#888;font-size:10px}
+    .admin-search{width:100%;height:42px;margin-bottom:12px;padding:0 13px;border:1px solid rgba(255,255,255,.14);border-radius:6px;background:#101010;color:#fff;outline:none}
+    .admin-search:focus{border-color:#e50914}
+    .admin-member-list{display:grid;gap:7px;max-height:440px;overflow:auto}
+    .admin-member{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:#111}
+    .admin-member-name{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+    .admin-member-tag{color:#777;font-size:9px;letter-spacing:.8px}
+    .admin-review-actions{display:flex;align-items:center;flex-shrink:0}
+    .admin-delete-review{padding:8px 11px;border:1px solid rgba(229,9,20,.35);border-radius:5px;background:rgba(229,9,20,.1);color:#ff858a;font-size:10px;cursor:pointer}
+    .admin-delete-review:hover{background:rgba(229,9,20,.2)}
+    .admin-empty{padding:14px 0;color:#888;font-size:12px}
     .admin-back{display:inline-flex;margin-top:28px;color:#aaa;font-size:12px}
     .admin-back:hover{color:#fff}
-    @media(max-width:650px){.admin-main{width:min(100% - 30px,1100px);padding-top:38px}.admin-stats{grid-template-columns:1fr;gap:10px}.admin-stat{padding:17px}.admin-stat-value{font-size:28px}.admin-review{padding:13px;gap:10px}.admin-section-head h2{font-size:19px}}
+    @media(max-width:800px){.admin-tools{grid-template-columns:1fr}.admin-panel{padding:17px}}\n    @media(max-width:650px){.admin-main{width:min(100% - 30px,1100px);padding-top:38px}.admin-stats{grid-template-columns:1fr;gap:10px}.admin-stat{padding:17px}.admin-stat-value{font-size:28px}.admin-review{padding:13px;gap:10px}.admin-section-head h2{font-size:19px}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js?v=2"></script>
-  <script defer src="admin.js?v=admin-panel-1"></script>
+  <script defer src="admin.js?v=admin-tools-2"></script>
 </head>
 <body class="detail-page admin-page">
   <header class="site-header admin-header">
@@ -57,10 +72,17 @@
       <article class="admin-stat"><span class="admin-stat-label">Community reviews</span><strong class="admin-stat-value" id="reviewCount">—</strong></article>
       <article class="admin-stat"><span class="admin-stat-label">Admin access</span><strong class="admin-stat-value" style="font-size:23px;color:#7ed6a0">Active</strong></article>
     </section>
-    <section class="admin-section" id="recentReviewsSection" hidden>
-      <div class="admin-section-head"><h2>Latest community reviews</h2><span>RECENT ACTIVITY</span></div>
-      <div class="admin-review-list" id="adminReviewList"></div>
-    </section>
+    <div class="admin-tools" id="adminTools" hidden>
+      <section class="admin-panel" aria-labelledby="memberDirectoryTitle">
+        <div class="admin-panel-head"><h2 id="memberDirectoryTitle">Members</h2><span class="admin-panel-note" id="memberDirectoryCount">DIRECTORY</span></div>
+        <input class="admin-search" id="memberSearch" type="search" placeholder="Search usernames…" autocomplete="off" aria-label="Search members by username">
+        <div class="admin-member-list" id="adminMemberList" aria-live="polite"><p class="admin-empty">Loading members…</p></div>
+      </section>
+      <section class="admin-panel" aria-labelledby="reviewModerationTitle">
+        <div class="admin-panel-head"><h2 id="reviewModerationTitle">Review moderation</h2><span class="admin-panel-note">LATEST 30</span></div>
+        <div class="admin-review-list" id="adminReviewList" aria-live="polite"><p class="admin-empty">Loading reviews…</p></div>
+      </section>
+    </div>
     <a class="admin-back" href="account.html">← Back to account</a>
   </main>
 </body>
