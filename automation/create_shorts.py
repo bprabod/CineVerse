@@ -127,7 +127,7 @@ def main():
         "sort_by": "primary_release_date.desc",
         "primary_release_date.gte": (today - timedelta(days=2)).isoformat(),
         "primary_release_date.lte": today.isoformat(),
-        "include_adult": "false", "vote_count.gte": 3, "page": 1,
+        "include_adult": "false", "page": 1,
     }
     response = requests.get("https://api.themoviedb.org/3/discover/movie", params=params, timeout=30)
     response.raise_for_status()
