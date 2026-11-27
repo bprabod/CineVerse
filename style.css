@@ -643,3 +643,57 @@
   transform:translateY(-1px);
   box-shadow:0 6px 20px rgba(229,9,20,.22);
 }
+
+
+/* Refined CineVerse password-recovery button */
+#modePrompt .forgot-password-action{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-height:44px;
+  padding:0 21px;
+  border:1px solid transparent;
+  border-radius:999px;
+  background:
+    linear-gradient(115deg,rgba(20,20,22,.98),rgba(10,10,12,.96)) padding-box,
+    linear-gradient(110deg,#8d0710,#f02b38 48%,#ff858b) border-box;
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.55px;
+  text-decoration:none;
+  box-shadow:0 5px 20px rgba(229,9,20,.16),inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .22s ease,box-shadow .22s ease,background .22s ease;
+}
+#modePrompt .forgot-password-action::before{
+  content:"✦";
+  display:inline-grid;
+  place-items:center;
+  width:21px;
+  height:21px;
+  border-radius:50%;
+  background:rgba(229,9,20,.18);
+  color:#ff737b;
+  font-size:13px;
+  line-height:1;
+  margin:0;
+}
+#modePrompt .forgot-password-action:hover,
+#modePrompt .forgot-password-action:focus-visible{
+  background:
+    linear-gradient(115deg,rgba(43,12,15,.98),rgba(18,10,12,.98)) padding-box,
+    linear-gradient(110deg,#e50914,#ff858b) border-box;
+  color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 9px 25px rgba(229,9,20,.28),inset 0 1px 0 rgba(255,255,255,.08);
+  outline:0;
+}
+#modePrompt .forgot-password-action:focus-visible{
+  outline:2px solid rgba(255,110,118,.75);
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  #modePrompt .forgot-password-action{transition:none}
+}
