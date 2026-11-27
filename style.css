@@ -863,12 +863,20 @@
   margin:0 0 9px 2px;
 }
 #container-6e2d91a6ad04321640ed7203cf20f430{
+  display:flex;
+  align-items:center;
+  justify-content:center;
   width:100%;
   min-width:0;
   overflow:hidden;
 }
 #container-6e2d91a6ad04321640ed7203cf20f430 > *{
   max-width:100%;
+}
+#container-6e2d91a6ad04321640ed7203cf20f430 iframe{
+  display:block;
+  max-width:100%;
+  border:0;
 }
 @media(max-width:700px){
   .cv-native-ad{
