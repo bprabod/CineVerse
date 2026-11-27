@@ -777,3 +777,9 @@
 /* Compact eye icon for password visibility */
 .password-field .password-visibility-toggle{width:30px;height:30px;display:flex;align-items:center;justify-content:center;padding:0}
 .password-field .password-visibility-toggle svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* Watchlist guest sign-in notice */
+.watchlist-signin-title{display:block;color:#fff;font-size:18px;font-weight:750;margin-bottom:7px}
+.watchlist-signin-copy{display:block;color:rgba(255,255,255,.68);font-size:13px;margin-bottom:14px}
+.watchlist-signin-link{display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:4px;background:var(--red,#e50914);color:#fff;text-decoration:none;font-size:12px;font-weight:750}
+.watchlist-signin-link:hover{filter:brightness(1.12)}
