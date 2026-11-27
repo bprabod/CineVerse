@@ -299,7 +299,10 @@ $("reviewText").addEventListener("input", () => {
   $("reviewCharCount").textContent = `${$("reviewText").value.length} / 1000`;
 });
 
-$("cancelReviewEdit").addEventListener("click", resetReviewForm);
+$("cancelReviewEdit").addEventListener("click", () => {
+  resetReviewForm();
+  $("reviewCompose").hidden = true;
+});
 
 $("reviewForm").addEventListener("submit", async event => {
   event.preventDefault();
