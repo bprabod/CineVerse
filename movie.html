@@ -84,8 +84,9 @@
     <section class="detail-extra reviews-section" id="reviewsSection" aria-labelledby="reviewsHeading">
       <div class="detail-section-heading reviews-heading">
         <div><p class="section-kicker">CINEVERSE COMMUNITY</p><h2 id="reviewsHeading">Member reviews</h2></div>
-        <div class="reviews-average" id="reviewsAverage" aria-live="polite">— <span> / 5</span></div>
+        <div class="reviews-heading-actions"><div class="reviews-average" id="reviewsAverage" aria-live="polite">— <span> / 5</span></div><button type="button" class="reviews-toggle-button" id="toggleReviews" aria-expanded="false" aria-controls="reviewsPanel">Add a review</button></div>
       </div>
+      <div class="reviews-panel" id="reviewsPanel" hidden>
       <p class="reviews-summary" id="reviewsSummary">Loading member reviews…</p>
       <div class="review-compose" id="reviewCompose">
         <div class="review-guest-prompt" id="reviewGuestPrompt" hidden>
@@ -112,6 +113,7 @@
         </form>
       </div>
       <div class="reviews-list" id="reviewsList" aria-live="polite"><p class="detail-muted">Loading reviews…</p></div>
+      </div>
     </section>
     <section class="detail-player" id="playerSection" hidden>
       <div class="player-heading"><h2 id="playerHeading">Now playing</h2><div class="player-controls"><button class="text-button" id="fullscreenButton" type="button">⛶ Fullscreen</button><button class="text-button" id="stopButton" type="button">Stop player</button></div></div>
