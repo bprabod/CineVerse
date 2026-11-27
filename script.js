@@ -122,106 +122,82 @@ function updateHero(movie) {
   if (meta) meta.innerHTML = `<span class="match">★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span class="rating">TMDB</span><span>${movie.type === "tv" ? "Series" : "Movie"}</span>`;
 }
 
+let heroSlides = [];
+let heroSlideIndex = 0;
+let heroTimer = null;
+let heroContent = null;
+
+async function showHeroSlide(index) {
+  if (!heroSlides.length) return;
+  const nextIndex = (index + heroSlides.length) % heroSlides.length;
+  const movie = heroSlides[nextIndex];
+  const version = movie.updated_at ? new Date(movie.updated_at).getTime() : 0;
+  const backdrop = `${IMAGE_BASE}original${movie.backdrop_path}${version ? `?v=${version}` : ''}`;
+  const preload = new Image();
+  preload.src = backdrop;
+  try {
+    if (typeof preload.decode === 'function') await preload.decode();
+    else await new Promise((resolve, reject) => { preload.onload = resolve; preload.onerror = reject; });
+  } catch (error) { console.warn('Featured slide image failed:', error); return; }
+  const words = (movie.title || 'Featured movie').trim().split(/\s+/);
+  const first = words.length > 1 ? words.slice(0, -1).join(' ') : words[0];
+  const last = words.length > 1 ? words[words.length - 1] : '';
+  requestAnimationFrame(() => {
+    const image = document.querySelector('.hero-image');
+    const title = document.querySelector('.hero-content h1');
+    const cta = document.querySelector('.hero-buttons .button-primary');
+    if (image) image.style.backgroundImage = `url("${backdrop}")`;
+    const eyebrow = document.querySelector('.hero-content .eyebrow');
+    const kicker = document.querySelector('.hero-kicker');
+    const description = document.querySelector('.hero-description');
+    const meta = document.querySelector('.hero-meta');
+    if (eyebrow) eyebrow.innerHTML = '<span class="live-dot"></span> FEATURED MOVIE';
+    if (kicker) kicker.textContent = 'NOW SHOWING ON CINEVERSE';
+    if (title) title.innerHTML = `${escapeHtml(first)}${last ? `<br><span>${escapeHtml(last)}</span>` : ''}`;
+    if (description) description.textContent = movie.overview || 'Discover this featured movie on CineVerse.';
+    if (meta) {
+      const year = (movie.release_date || '').slice(0, 4);
+      const rating = Number(movie.vote_average || 0);
+      meta.innerHTML = `${rating ? `<span class="match">★ ${rating.toFixed(1)}/10</span>` : ''}${year ? `<span>${escapeHtml(year)}</span>` : ''}<span class="rating">MOVIE</span>`;
+    }
+    if (cta) {
+      cta.innerHTML = `<span class="play-symbol">▶</span> ${escapeHtml(heroContent?.cta_label || 'Explore title')}`;
+      cta.href = `movie.html?id=${encodeURIComponent(movie.tmdb_id || movie.id)}&type=movie`;
+    }
+    const count = $('heroSlideCount');
+    if (count) count.textContent = `${String(nextIndex + 1).padStart(2, '0')} / ${String(heroSlides.length).padStart(2, '0')}`;
+  });
+  heroSlideIndex = nextIndex;
+}
+
+function startHeroAutoplay() {
+  clearInterval(heroTimer);
+  if (heroSlides.length > 1) heroTimer = setInterval(() => showHeroSlide(heroSlideIndex + 1), 8000);
+}
+
 async function loadDatabaseHero() {
   try {
-    const headers = {
-      apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
-      Accept: "application/json"
-    };
-    // Prefer the build-time snapshot so every visitor gets the featured movie immediately.
-    // Fall back to Supabase if the snapshot is absent.
-    const cachedFeatured = window.CV_HERO_CACHE || null;
-    const [backgroundResponse, contentResponse] = await Promise.all([
-      cachedFeatured ? Promise.resolve(null) :
-        fetch(`${SUPABASE_URL}/rest/v1/homepage_background?select=title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`, { headers }),
-      fetch(`${SUPABASE_URL}/rest/v1/homepage_content?select=cta_label,cta_href,side_note,side_count&id=eq.1`, { headers })
-    ]);
-
-    let featured = cachedFeatured;
-    if (!featured) {
-      if (!backgroundResponse?.ok) throw new Error("Could not load featured movie data.");
-      const backgroundRows = await backgroundResponse.json();
-      featured = backgroundRows[0];
+    const headers = { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, Accept: 'application/json' };
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/homepage_content?select=cta_label&id=eq.1`, { headers });
+    if (response.ok) heroContent = (await response.json())[0] || null;
+    if (Array.isArray(window.CV_HERO_SLIDES) && window.CV_HERO_SLIDES.length) {
+      heroSlides = window.CV_HERO_SLIDES.slice(0, 5);
+    } else {
+      const fallback = await fetch(`${SUPABASE_URL}/rest/v1/homepage_background?select=tmdb_id,title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`, { headers });
+      if (!fallback.ok) throw new Error('Could not load featured movie data.');
+      heroSlides = (await fallback.json()).filter(movie => movie.backdrop_path);
     }
-    if (!featured || !featured.backdrop_path) return;
-
-    let content = null;
-    if (contentResponse.ok) {
-      const contentRows = await contentResponse.json();
-      content = contentRows[0] || null;
-    }
-
-    // Preload the new backdrop first. Keep the old image and its matching
-    // text visible until the new image is ready, then swap the whole hero
-    // together so users never see a mismatched title and background.
-    const imageVersion = featured.updated_at ? new Date(featured.updated_at).getTime() : Date.now();
-    const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}?v=${imageVersion}`;
-    const preload = new Image();
-    preload.src = backdrop;
-    try {
-      if (typeof preload.decode === "function") {
-        await preload.decode();
-      } else {
-        await new Promise((resolve, reject) => {
-          preload.onload = resolve;
-          preload.onerror = reject;
-        });
-      }
-    } catch (imageError) {
-      console.warn("Featured backdrop could not be prepared; keeping the previous hero.", imageError);
-      return;
-    }
-
-    const titleText = featured.title || "Featured movie";
-    const words = titleText.trim().split(/\s+/);
-    const titleLine1 = words.length > 1 ? words.slice(0, -1).join(" ") : titleText;
-    const titleLine2 = words.length > 1 ? words[words.length - 1] : "";
-    const title = document.querySelector(".hero-content h1");
-    const eyebrow = document.querySelector(".hero-content .eyebrow");
-    const kicker = document.querySelector(".hero-kicker");
-    const description = document.querySelector(".hero-description");
-    const meta = document.querySelector(".hero-meta");
-    const image = document.querySelector(".hero-image");
-
-    // Apply the backdrop and all matching movie details in one animation frame.
-    requestAnimationFrame(() => {
-      if (image) image.style.backgroundImage = `url("${backdrop}")`;
-      if (eyebrow) eyebrow.innerHTML = '<span class="live-dot"></span> FEATURED MOVIE';
-      if (kicker) kicker.textContent = "NOW SHOWING ON CINEVERSE";
-      if (title) title.innerHTML = `${escapeHtml(titleLine1)}${titleLine2 ? `<br><span>${escapeHtml(titleLine2)}</span>` : ""}`;
-      if (description) description.textContent = featured.overview || "Discover this featured movie on CineVerse.";
-      if (meta) {
-        const year = (featured.release_date || "").slice(0, 4);
-        const rating = Number(featured.vote_average || 0);
-        meta.innerHTML = [
-          rating ? `<span class="match">★ ${rating.toFixed(1)}/10</span>` : "",
-          year ? `<span>${escapeHtml(year)}</span>` : "",
-          '<span class="rating">MOVIE</span>'
-        ].join("");
-      }
-
-      if (content) {
-        const cta = document.querySelector(".hero-buttons .button-primary");
-        const sideNote = document.querySelector(".hero-side-note");
-        if (cta) {
-          cta.innerHTML = `<span class="play-symbol">▶</span> ${escapeHtml(content.cta_label || "Explore titles")}`;
-          cta.setAttribute("href", content.cta_href || "#trending");
-        }
-        if (sideNote) {
-          sideNote.textContent = content.side_note || "";
-          if (content.side_count) {
-            const count = document.createElement("span");
-            count.textContent = content.side_count;
-            sideNote.append(" ", count);
-          }
-        }
-      }
-    });
-  } catch (error) {
-    console.warn("Using the built-in homepage hero because saved homepage content is unavailable:", error);
-  }
+    if (!heroSlides.length) return;
+    await showHeroSlide(0);
+    startHeroAutoplay();
+  } catch (error) { console.warn('Could not load homepage featured movies:', error); }
 }
+
+$('heroPrev')?.addEventListener('click', () => { showHeroSlide(heroSlideIndex - 1); startHeroAutoplay(); });
+$('heroNext')?.addEventListener('click', () => { showHeroSlide(heroSlideIndex + 1); startHeroAutoplay(); });
+const heroControls = document.querySelector('.hero-carousel-controls');
+heroControls?.addEventListener('mouseenter', () => clearInterval(heroTimer));
+heroControls?.addEventListener('mouseleave', startHeroAutoplay);
 
 
 const dialog = $("movieDialog");
