@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090909"><meta name="robots" content="noindex,follow">
   <title>My Account | CineVerse</title>
   <link rel="icon" href="favicon.svg?v=6">
-  <link rel="stylesheet" href="style.css?v=profile-reviews-1">
+  <link rel="stylesheet" href="style.css?v=contact-admin-1">
   <style>
     /* Netflix-inspired account dashboard, scoped to this page. */
     .account-page{background:#080808;background-image:radial-gradient(ellipse at 50% 0%,rgba(120,12,20,.22),transparent 42%)}
@@ -50,6 +50,29 @@
     }
     @media(max-width:390px){.account-page .member-site-header{flex-wrap:wrap}.account-page .member-site-header .main-nav{order:3;flex-basis:100%;padding:3px 0 5px}.account-page .member-site-header .header-actions{margin-left:auto}}
 
+
+    .account-page .support-section{margin:36px 0 40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1)}
+    .account-page .support-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+    .account-page .support-heading h2{margin:0;font-size:25px;letter-spacing:-.7px}
+    .account-page .support-card{padding:18px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:rgba(255,255,255,.025)}
+    .account-page .support-form{display:grid;gap:10px}
+    .account-page .support-form input,.account-page .support-form textarea{box-sizing:border-box;width:100%;padding:12px;border:1px solid #393939;border-radius:6px;background:#0d0d0d;color:#fff;font:12px/1.6 "DM Sans",Arial,sans-serif;outline:none}
+    .account-page .support-form textarea{min-height:100px;resize:vertical}
+    .account-page .support-form input:focus,.account-page .support-form textarea:focus{border-color:#e50914}
+    .account-page .support-thread-list{display:grid;gap:7px;margin-top:18px}
+    .account-page .support-thread-button{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.09);border-radius:6px;background:#111;color:#eee;text-align:left;cursor:pointer}
+    .account-page .support-thread-button.is-active{border-color:rgba(229,9,20,.65);background:rgba(229,9,20,.08)}
+    .account-page .support-thread-button small{display:block;margin-top:4px;color:#888;font-size:9px}
+    .account-page .support-conversation{margin-top:14px;padding:15px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:#0e0e0e}
+    .account-page .support-conversation[hidden]{display:none!important}
+    .account-page .support-message{max-width:88%;margin:8px 0;padding:10px 12px;border-radius:8px;background:#202020;color:#ddd;font-size:12px;line-height:1.65;overflow-wrap:anywhere;white-space:pre-wrap}
+    .account-page .support-message.is-mine{margin-left:auto;background:#4b1116}
+    .account-page .support-message small{display:block;margin-top:5px;color:#aaa;font-size:9px}
+    .account-page .support-reply-form{display:grid;gap:9px;margin-top:14px}
+    .account-page .support-reply-form[hidden]{display:none!important}
+    .account-page .support-reply-form textarea{width:100%;box-sizing:border-box;min-height:72px;padding:11px;border:1px solid #393939;border-radius:6px;background:#080808;color:#fff;font:12px/1.6 "DM Sans",Arial,sans-serif}
+    .account-page .support-status{min-height:16px;margin:8px 0 0;color:#eaa0a4;font-size:10px}
+    @media(max-width:600px){.account-page .support-heading h2{font-size:22px}.account-page .support-card{padding:13px}.account-page .support-message{max-width:95%}}
     .account-page .profile-reviews-section{margin:34px 0 38px}
     .account-page .profile-reviews-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
     .account-page .profile-reviews-heading h2{font-size:25px;letter-spacing:-.7px;margin:0}
@@ -70,7 +93,7 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js"></script>
-  <script defer src="account.js?v=admin-panel-1"></script>
+  <script defer src="account.js?v=contact-admin-1"></script>
   <script defer src="native-ads.js?v=mobile-ad-layout-1"></script>
 </head>
 <body class="detail-page account-page">
@@ -114,6 +137,31 @@
       </div>
       <div class="profile-reviews-list" id="profileReviewsList" aria-live="polite">
         <p class="profile-reviews-empty">Loading your reviews…</p>
+      </div>
+    </section>
+
+
+    <section class="support-section" aria-labelledby="supportHeading">
+      <div class="support-heading">
+        <div><p class="section-kicker">NEED A HAND?</p><h2 id="supportHeading">Contact Admin</h2></div>
+      </div>
+      <div class="support-card">
+        <form class="support-form" id="supportNewForm">
+          <input id="supportSubject" type="text" minlength="3" maxlength="100" placeholder="Subject" required>
+          <textarea id="supportFirstMessage" minlength="1" maxlength="2000" placeholder="Write your message to the CineVerse admin…" required></textarea>
+          <button class="button button-primary" id="supportSendButton" type="submit">Send Message</button>
+        </form>
+        <p class="support-status" id="supportStatus" role="status" aria-live="polite"></p>
+        <div class="support-thread-list" id="supportThreadList" aria-label="Your conversations">
+          <p class="profile-reviews-empty">Loading your messages…</p>
+        </div>
+        <div class="support-conversation" id="supportConversation" hidden>
+          <div id="supportMessages" aria-live="polite"></div>
+          <form class="support-reply-form" id="supportReplyForm">
+            <textarea id="supportReplyText" maxlength="2000" placeholder="Write a reply…" required></textarea>
+            <button class="button button-secondary" id="supportReplyButton" type="submit">Send Reply</button>
+          </form>
+        </div>
       </div>
     </section>
 
