@@ -12,6 +12,33 @@ let currentTitle = null;
 let currentEpisodes = [];
 let selectedSeason = null;
 const $ = id => document.getElementById(id);
+function releaseCountdownHTML(dateValue) {
+  return formatReleaseCountdown(dateValue) ? '<span class="release-countdown-inline" data-release-countdown="' + escapeHtml(dateValue) + '"></span>' : '';
+}
+function formatReleaseCountdown(dateValue) {
+  const match = String(dateValue || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return '';
+  const target = new Date(Number(match[1]), Number(match[2])-1, Number(match[3]));
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.floor((target.getTime()-today.getTime())/86400000);
+  if (days < 0) return '';
+  if (days === 0) return 'RELEASES TODAY';
+  const remaining = Math.max(0, target.getTime()-now.getTime());
+  const d = Math.floor(remaining/86400000);
+  const h = Math.floor((remaining%86400000)/3600000);
+  const m = Math.floor((remaining%3600000)/60000);
+  const s = Math.floor((remaining%60000)/1000);
+  return d + 'd : ' + String(h).padStart(2,'0') + 'h : ' + String(m).padStart(2,'0') + 'm : ' + String(s).padStart(2,'0') + 's';
+}
+function refreshReleaseCountdowns() {
+  document.querySelectorAll('[data-release-countdown]').forEach(node => {
+    const value = formatReleaseCountdown(node.dataset.releaseCountdown);
+    if (!value) { node.hidden = true; return; }
+    node.hidden = false; node.textContent = value;
+  });
+}
+setInterval(refreshReleaseCountdowns, 1000);
 const posterFallback = "https://placehold.co/500x750/171717/eeeeee?text=CineVerse";
 const profileFallback = "https://placehold.co/300x450/202020/eeeeee?text=No+Photo";
 
@@ -142,6 +169,9 @@ async function loadTitle() {
     $("detailPoster").alt = `Poster for ${title}`;
     $("detailPoster").onerror = () => { $("detailPoster").src = posterFallback; };
     $("detailMeta").innerHTML = `<span class="match">★ ${Number(item.vote_average || 0).toFixed(1)}</span><span>${year || "—"}</span><span class="rating">${type === "tv" ? "TV" : "TMDB"}</span><span>${Number(item.vote_count || 0).toLocaleString()} votes</span>`;
+    const releaseDate = item.release_date || item.first_air_date || "";
+    const countdown = $("releaseCountdown");
+    if (countdown && formatReleaseCountdown(releaseDate)) { countdown.dataset.releaseCountdown = releaseDate; countdown.hidden = false; refreshReleaseCountdowns(); }
     document.title = `${title} — CineVerse`;
     renderExtraDetails(item);
     renderCredits(item);
