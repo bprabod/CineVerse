@@ -97,6 +97,24 @@ function renderExtraDetails(item) {
   }
 }
 
+async function syncDetailWatchlistButton() {
+  const button = $("listButton");
+  button.disabled = true; button.textContent = "Checking…";
+  try {
+    const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
+    if (authError) throw authError;
+    if (!user) { button.disabled = false; button.textContent = "＋ Add to Watchlist"; return; }
+    const { data, error } = await cvSupabase.from("watchlist").select("id")
+      .eq("user_id", user.id).eq("tmdb_id", Number(id)).eq("media_type", type).maybeSingle();
+    if (error) throw error;
+    button.disabled = Boolean(data);
+    button.textContent = data ? "✓ In Watchlist" : "＋ Add to Watchlist";
+  } catch (error) {
+    console.warn("Could not check Watchlist status:", error);
+    button.disabled = false; button.textContent = "＋ Add to Watchlist";
+  }
+}
+
 async function loadTitle() {
   if (!id || !/^\d+$/.test(id)) {
     $("detailTitle").textContent = "Title not found";
@@ -107,6 +125,7 @@ async function loadTitle() {
   try {
     const item = await tmdb(`/${type}/${id}`, { append_to_response: "credits,videos" });
     currentTitle = item;
+    await syncDetailWatchlistButton();
     const title = item.title || item.name || "Untitled";
     const year = (item.release_date || item.first_air_date || "").slice(0, 4);
     $("detailType").textContent = type === "tv" ? "TV SERIES" : "MOVIE";
@@ -224,15 +243,22 @@ $("stopButton").addEventListener("click", () => {
 });
 
 $("listButton").addEventListener("click", async () => {
-  if (!currentTitle) return;
-  const {data:{user},error:authError}=await cvSupabase.auth.getUser();
-  if(authError||!user){location.href="auth.html";return;}
-  const title=currentTitle.title||currentTitle.name||"Untitled";
-  const poster=currentTitle.poster_path? `${IMAGE_BASE}w500${currentTitle.poster_path}`:posterFallback;
-  const {error}=await cvSupabase.from("watchlist").insert({user_id:user.id,tmdb_id:Number(id),media_type:type,title,poster_url:poster});
-  if(error && error.code==="23505") $("detailStatus").textContent="This title is already in your list.";
-  else if(error) $("detailStatus").textContent="Could not save title: "+error.message;
-  else $("detailStatus").textContent=title+" added to your list.";
+  const button = $("listButton");
+  if (!currentTitle || button.disabled) return;
+  button.disabled = true; button.textContent = "Saving…";
+  const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
+  if (authError || !user) { location.href = "auth.html"; return; }
+  const title = currentTitle.title || currentTitle.name || "Untitled";
+  const poster = currentTitle.poster_path ? `${IMAGE_BASE}w500${currentTitle.poster_path}` : posterFallback;
+  const { error } = await cvSupabase.from("watchlist").insert({
+    user_id: user.id, tmdb_id: Number(id), media_type: type, title, poster_url: poster
+  });
+  if (error && error.code !== "23505") {
+    $("detailStatus").textContent = "Could not save title: " + error.message;
+    button.disabled = false; button.textContent = "＋ Add to Watchlist"; return;
+  }
+  $("detailStatus").textContent = error ? "This title is already in your Watchlist." : title + " added to your Watchlist.";
+  button.disabled = true; button.textContent = "✓ In Watchlist";
 });
 
 window.addEventListener("pagehide", () => { $("playerFrame").src = "about:blank"; });

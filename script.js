@@ -244,6 +244,24 @@ heroControls?.addEventListener('mouseleave', startHeroAutoplay);
 
 const dialog = $("movieDialog");
 
+async function syncDialogWatchButton() {
+  const button = $("dialogWatch");
+  button.disabled = true; button.textContent = "Checking…";
+  try {
+    const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
+    if (authError) throw authError;
+    if (!user) { button.disabled = false; button.textContent = "＋ Add to Watchlist"; return; }
+    const { data, error } = await cvSupabase.from("watchlist").select("id")
+      .eq("user_id", user.id).eq("tmdb_id", Number(activeMovie.id)).eq("media_type", activeMovie.type).maybeSingle();
+    if (error) throw error;
+    button.disabled = Boolean(data);
+    button.textContent = data ? "✓ In Watchlist" : "＋ Add to Watchlist";
+  } catch (error) {
+    console.warn("Could not check Watchlist status:", error);
+    button.disabled = false; button.textContent = "＋ Add to Watchlist";
+  }
+}
+
 async function openMovie(id, type) {
   let movie = [...catalogue.trending, ...catalogue.movies, ...catalogue.series, ...searchResults]
     .find(item => String(item.id) === String(id) && item.type === type);
@@ -268,6 +286,7 @@ async function openMovie(id, type) {
   } catch (error) {
     console.warn("Could not load extended title details:", error);
   }
+  await syncDialogWatchButton();
   if (!dialog.open) dialog.showModal();
 }
 
@@ -303,17 +322,21 @@ dialog.addEventListener("close", () => {
 });
 
 $("dialogWatch").addEventListener("click", async () => {
-  if (!activeMovie) return;
-  const {data:{user},error:authError}=await cvSupabase.auth.getUser();
-  if(authError||!user){location.href="auth.html";return;}
-  const {error}=await cvSupabase.from("watchlist").insert({
-    user_id:user.id,tmdb_id:activeMovie.id,media_type:activeMovie.type,
-    title:activeMovie.title,poster_url:activeMovie.image
+  const button = $("dialogWatch");
+  if (!activeMovie || button.disabled) return;
+  button.disabled = true; button.textContent = "Saving…";
+  const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
+  if (authError || !user) { location.href = "auth.html"; return; }
+  const { error } = await cvSupabase.from("watchlist").insert({
+    user_id: user.id, tmdb_id: activeMovie.id, media_type: activeMovie.type,
+    title: activeMovie.title, poster_url: activeMovie.image
   });
-  if(error && error.code==="23505") showToast("This title is already in your list");
-  else if(error) showToast("Could not save title: "+error.message);
-  else showToast(`${activeMovie.title} added to your list`);
-  dialog.close();
+  if (error && error.code !== "23505") {
+    showToast("Could not save title: " + error.message);
+    button.disabled = false; button.textContent = "＋ Add to Watchlist"; return;
+  }
+  showToast(error ? "This title is already in your Watchlist." : `${activeMovie.title} added to your Watchlist.`);
+  button.disabled = true; button.textContent = "✓ In Watchlist";
 });
 
 document.querySelectorAll("[data-scroll]").forEach(button => {
