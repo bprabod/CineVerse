@@ -49,6 +49,24 @@
       .account-page .account-danger-zone .account-delete-button{width:100%}
     }
     @media(max-width:390px){.account-page .member-site-header{flex-wrap:wrap}.account-page .member-site-header .main-nav{order:3;flex-basis:100%;padding:3px 0 5px}.account-page .member-site-header .header-actions{margin-left:auto}}
+
+    .account-page .profile-reviews-section{margin:34px 0 38px}
+    .account-page .profile-reviews-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+    .account-page .profile-reviews-heading h2{font-size:25px;letter-spacing:-.7px;margin:0}
+    .account-page .profile-reviews-count{min-width:25px;height:25px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.13);border-radius:50%;color:#aaa;font-size:10px}
+    .account-page .profile-reviews-list{display:grid;gap:7px}
+    .account-page .profile-review-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:7px;background:rgba(255,255,255,.025)}
+    .account-page .profile-review-main{min-width:0;flex:1}
+    .account-page .profile-review-title{display:inline-block;color:#f1f1f1;font-size:12px;font-weight:700;text-decoration:none}
+    .account-page .profile-review-title:hover{color:#ff777e}
+    .account-page .profile-review-meta{display:block;margin-top:3px;color:#777;font-size:9px;letter-spacing:.3px}
+    .account-page .profile-review-text{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:6px 0 0;color:#aaa;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+    .account-page .profile-review-side{display:flex;align-items:center;gap:10px;flex-shrink:0}
+    .account-page .profile-review-stars{color:#f5bd42;font-size:11px;white-space:nowrap;letter-spacing:0}
+    .account-page .profile-review-open{color:#888;font-size:14px;text-decoration:none}
+    .account-page .profile-review-open:hover{color:#fff}
+    .account-page .profile-reviews-empty{padding:13px 0;color:#888;font-size:11px;line-height:1.6}
+    @media(max-width:600px){.account-page .profile-reviews-heading h2{font-size:22px}.account-page .profile-review-row{padding:10px;gap:8px}.account-page .profile-review-stars{font-size:10px}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js"></script>
