@@ -131,13 +131,45 @@ async function loadDatabaseHero() {
     };
     const [backgroundResponse, contentResponse] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/homepage_background?select=title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`, { headers }),
-      fetch(`${SUPABASE_URL}/rest/v1/homepage_content?select=*&id=eq.1`, { headers })
+      fetch(`${SUPABASE_URL}/rest/v1/homepage_content?select=cta_label,cta_href,side_note,side_count&id=eq.1`, { headers })
     ]);
 
+    let featured = null;
     if (backgroundResponse.ok) {
       const rows = await backgroundResponse.json();
-      const featured = rows[0];
-      if (featured?.backdrop_path) {
+      featured = rows[0] || null;
+    } else {
+      console.warn("Could not read featured background from Supabase.");
+    }
+
+    // The title, year, rating and synopsis always come from the same
+    // database record as the featured backdrop image.
+    if (featured) {
+      const titleText = featured.title || "Featured movie";
+      const words = titleText.trim().split(/\\s+/);
+      const titleLine1 = words.length > 1 ? words.slice(0, -1).join(" ") : titleText;
+      const titleLine2 = words.length > 1 ? words[words.length - 1] : "";
+      const title = document.querySelector(".hero-content h1");
+      const eyebrow = document.querySelector(".hero-content .eyebrow");
+      const kicker = document.querySelector(".hero-kicker");
+      const description = document.querySelector(".hero-description");
+      const meta = document.querySelector(".hero-meta");
+
+      if (eyebrow) eyebrow.innerHTML = '<span class="live-dot"></span> FEATURED MOVIE';
+      if (kicker) kicker.textContent = "NOW SHOWING ON CINEVERSE";
+      if (title) title.innerHTML = `${escapeHtml(titleLine1)}${titleLine2 ? `<br><span>${escapeHtml(titleLine2)}</span>` : ""}`;
+      if (description) description.textContent = featured.overview || "Discover this featured movie on CineVerse.";
+      if (meta) {
+        const year = (featured.release_date || "").slice(0, 4);
+        const rating = Number(featured.vote_average || 0);
+        meta.innerHTML = [
+          rating ? `<span class="match">★ ${rating.toFixed(1)}/10</span>` : "",
+          year ? `<span>${escapeHtml(year)}</span>` : "",
+          '<span class="rating">MOVIE</span>'
+        ].join("");
+      }
+
+      if (featured.backdrop_path) {
         const imageVersion = featured.updated_at ? new Date(featured.updated_at).getTime() : Date.now();
         const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}?v=${imageVersion}`;
         const preload = new Image();
@@ -148,35 +180,16 @@ async function loadDatabaseHero() {
         preload.onerror = () => console.warn("Could not load the Supabase featured backdrop image.");
         preload.src = backdrop;
       }
-    } else {
-      console.warn("Could not read featured background from Supabase.");
     }
 
+    // Keep only presentation controls in homepage_content; it no longer
+    // supplies a separate, potentially mismatched movie title or synopsis.
     if (contentResponse.ok) {
       const rows = await contentResponse.json();
       const content = rows[0];
       if (content) {
-        const eyebrow = document.querySelector(".hero-content .eyebrow");
-        const kicker = document.querySelector(".hero-kicker");
-        const title = document.querySelector(".hero-content h1");
-        const description = document.querySelector(".hero-description");
-        const meta = document.querySelector(".hero-meta");
         const cta = document.querySelector(".hero-buttons .button-primary");
         const sideNote = document.querySelector(".hero-side-note");
-
-        if (eyebrow) eyebrow.innerHTML = `<span class="live-dot"></span> ${escapeHtml(content.eyebrow)}`;
-        if (kicker) kicker.textContent = content.kicker || "";
-        if (title) title.innerHTML = `${escapeHtml(content.title_line1)}<br><span>${escapeHtml(content.title_line2)}</span>`;
-        if (description) description.textContent = content.description || "";
-        if (meta) {
-          meta.innerHTML = [
-            content.match_label ? `<span class="match">${escapeHtml(content.match_label)}</span>` : "",
-            content.year_label ? `<span>${escapeHtml(content.year_label)}</span>` : "",
-            content.rating_label ? `<span class="rating">${escapeHtml(content.rating_label)}</span>` : "",
-            content.duration_label ? `<span>${escapeHtml(content.duration_label)}</span>` : "",
-            content.quality_label ? `<span class="quality">${escapeHtml(content.quality_label)}</span>` : ""
-          ].join("");
-        }
         if (cta) {
           cta.innerHTML = `<span class="play-symbol">▶</span> ${escapeHtml(content.cta_label || "Explore titles")}`;
           cta.setAttribute("href", content.cta_href || "#trending");
@@ -191,7 +204,7 @@ async function loadDatabaseHero() {
         }
       }
     } else {
-      console.warn("Could not read homepage text content from Supabase.");
+      console.warn("Could not read homepage presentation settings from Supabase.");
     }
   } catch (error) {
     console.warn("Using the built-in homepage hero because saved homepage content is unavailable:", error);
