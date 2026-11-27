@@ -146,7 +146,7 @@ async function loadDatabaseHero() {
     // database record as the featured backdrop image.
     if (featured) {
       const titleText = featured.title || "Featured movie";
-      const words = titleText.trim().split(/\\s+/);
+      const words = titleText.trim().split(/\s+/);
       const titleLine1 = words.length > 1 ? words.slice(0, -1).join(" ") : titleText;
       const titleLine2 = words.length > 1 ? words[words.length - 1] : "";
       const title = document.querySelector(".hero-content h1");
