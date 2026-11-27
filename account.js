@@ -45,6 +45,50 @@ async function loadRecentHistory(userId) {
   }
 }
 
+
+async function loadProfileReviews(userId) {
+  const list = document.getElementById("profileReviewsList");
+  const count = document.getElementById("profileReviewsCount");
+  if (!list || !count) return;
+  try {
+    const { data, error } = await cvSupabase.from("title_reviews")
+      .select("id,tmdb_id,media_type,title,rating,review_text,created_at,updated_at")
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .limit(30);
+    if (error) throw error;
+    count.textContent = String(data?.length || 0);
+    if (!data?.length) {
+      list.innerHTML = '<p class="profile-reviews-empty">Your reviews will appear here after you review a movie or series.</p>';
+      return;
+    }
+    list.innerHTML = data.map(review => {
+      const date = new Date(review.updated_at || review.created_at);
+      const dateLabel = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(undefined, {day:"numeric",month:"short",year:"numeric"});
+      const kind = review.media_type === "tv" ? "SERIES" : "MOVIE";
+      const href = "movie.html?id=" + encodeURIComponent(review.tmdb_id) + "&type=" + encodeURIComponent(review.media_type);
+      const title = escapeHistoryHtml(review.title || "Untitled");
+      const body = escapeHistoryHtml(review.review_text || "");
+      const stars = "★".repeat(Number(review.rating)) + "☆".repeat(5 - Number(review.rating));
+      return `<article class="profile-review-row">
+        <div class="profile-review-main">
+          <a class="profile-review-title" href="${href}">${title}</a>
+          <span class="profile-review-meta">${kind} · ${escapeHistoryHtml(dateLabel)}</span>
+          <p class="profile-review-text">${body}</p>
+        </div>
+        <div class="profile-review-side">
+          <span class="profile-review-stars" aria-label="${Number(review.rating)} out of 5 stars">${stars}</span>
+          <a class="profile-review-open" href="${href}" aria-label="Open ${title}">↗</a>
+        </div>
+      </article>`;
+    }).join("");
+  } catch (error) {
+    console.warn("Could not load profile reviews:", error);
+    count.textContent = "—";
+    list.innerHTML = '<p class="profile-reviews-empty">Could not load your reviews right now.</p>';
+  }
+}
+
 function escapeHistoryHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
@@ -72,6 +116,7 @@ function escapeHistoryHtml(value) {
     emailEl.textContent = user.email || "Email unavailable";
     statusEl.textContent = "Your account is active.";
     await loadRecentHistory(user.id);
+    await loadProfileReviews(user.id);
   } catch (error) {
     console.warn("CineVerse account session check failed:", error);
     statusEl.textContent = "We couldn't verify your session. Please refresh the page or sign in again.";
