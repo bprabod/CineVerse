@@ -126,11 +126,13 @@ let heroSlides = [];
 let heroSlideIndex = 0;
 let heroTimer = null;
 let heroContent = null;
+let heroTransitionToken = 0;
 
 async function showHeroSlide(index) {
   if (!heroSlides.length) return;
   const nextIndex = (index + heroSlides.length) % heroSlides.length;
   const movie = heroSlides[nextIndex];
+  const transitionToken = ++heroTransitionToken;
   const version = movie.updated_at ? new Date(movie.updated_at).getTime() : 0;
   const backdrop = `${IMAGE_BASE}original${movie.backdrop_path}${version ? `?v=${version}` : ''}`;
   const preload = new Image();
@@ -139,10 +141,16 @@ async function showHeroSlide(index) {
     if (typeof preload.decode === 'function') await preload.decode();
     else await new Promise((resolve, reject) => { preload.onload = resolve; preload.onerror = reject; });
   } catch (error) { console.warn('Featured slide image failed:', error); return; }
+  if (transitionToken !== heroTransitionToken) return;
   const words = (movie.title || 'Featured movie').trim().split(/\s+/);
   const first = words.length > 1 ? words.slice(0, -1).join(' ') : words[0];
   const last = words.length > 1 ? words[words.length - 1] : '';
+  const heroImage = document.querySelector('.hero-image');
+  const heroContentElement = document.querySelector('.hero-content');
+  heroImage?.classList.add('is-changing');
+  heroContentElement?.classList.add('is-changing');
   requestAnimationFrame(() => {
+    if (transitionToken !== heroTransitionToken) return;
     const image = document.querySelector('.hero-image');
     const title = document.querySelector('.hero-content h1');
     const cta = document.querySelector('.hero-buttons .button-primary');
@@ -166,6 +174,10 @@ async function showHeroSlide(index) {
     }
     const count = $('heroSlideCount');
     if (count) count.textContent = `${String(nextIndex + 1).padStart(2, '0')} / ${String(heroSlides.length).padStart(2, '0')}`;
+    requestAnimationFrame(() => {
+      image?.classList.remove('is-changing');
+      heroContentElement?.classList.remove('is-changing');
+    });
   });
   heroSlideIndex = nextIndex;
 }
@@ -193,9 +205,17 @@ async function loadDatabaseHero() {
   } catch (error) { console.warn('Could not load homepage featured movies:', error); }
 }
 
-$('heroPrev')?.addEventListener('click', () => { showHeroSlide(heroSlideIndex - 1); startHeroAutoplay(); });
-$('heroNext')?.addEventListener('click', () => { showHeroSlide(heroSlideIndex + 1); startHeroAutoplay(); });
 const heroControls = document.querySelector('.hero-carousel-controls');
+heroControls?.addEventListener('click', event => {
+  const button = event.target.closest('button');
+  if (!button || !heroSlides.length) return;
+  event.preventDefault();
+  event.stopPropagation();
+  clearInterval(heroTimer);
+  if (button.id === 'heroPrev') showHeroSlide(heroSlideIndex - 1);
+  if (button.id === 'heroNext') showHeroSlide(heroSlideIndex + 1);
+  startHeroAutoplay();
+});
 heroControls?.addEventListener('mouseenter', () => clearInterval(heroTimer));
 heroControls?.addEventListener('mouseleave', startHeroAutoplay);
 

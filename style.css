@@ -398,4 +398,32 @@
 }
 
 
-.hero-carousel-controls{position:absolute;right:6.2%;bottom:70px;z-index:5;display:flex;align-items:center;gap:12px;color:#ddd;font-size:10px;letter-spacing:1.5px}.hero-carousel-controls button{width:30px;height:30px;border:1px solid #ffffff70;border-radius:50%;background:#09090988;color:#fff;font-size:22px;line-height:1;display:grid;place-items:center;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}.hero-carousel-controls button:hover{background:var(--red);border-color:var(--red);transform:scale(1.08)}#heroSlideCount{min-width:42px;text-align:center;color:#ddd}@media(max-width:700px){.hero-carousel-controls{right:5%;bottom:30px;gap:8px}.hero-carousel-controls button{width:27px;height:27px}}
+/* Compact Netflix-inspired carousel controls; keep text from expanding the hero layout. */
+.hero-carousel-controls{
+  position:absolute;right:6.2%;bottom:42px;z-index:10;
+  display:flex;align-items:center;gap:9px;
+  color:#ddd;font-size:9px;line-height:1;letter-spacing:1px;
+  pointer-events:auto;white-space:nowrap;
+}
+.hero-carousel-controls button{
+  appearance:none;width:28px;height:28px;min-width:28px;min-height:28px;
+  padding:0;border:1px solid #ffffff70;border-radius:50%;
+  background:rgba(9,9,9,.72);color:#fff;font:500 16px/1 Arial,sans-serif;
+  display:grid;place-items:center;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.hero-carousel-controls button:hover,
+.hero-carousel-controls button:focus-visible{
+  background:var(--red);border-color:var(--red);transform:scale(1.06);
+  outline:none;
+}
+#heroSlideCount{display:block;min-width:35px;text-align:center;font-size:9px;line-height:1;color:#ddd}
+.hero-image{transition:opacity .42s ease,transform 8s ease}
+.hero-image.is-changing{opacity:.22;transform:scale(1.035)}
+.hero-content{transition:opacity .28s ease,transform .28s ease}
+.hero-content.is-changing{opacity:.25;transform:translateY(9px)}
+@media(max-width:700px){
+  .hero-carousel-controls{right:5%;bottom:22px;gap:7px}
+  .hero-carousel-controls button{width:26px;height:26px;min-width:26px;min-height:26px;font-size:15px}
+  #heroSlideCount{min-width:32px;font-size:8px}
+}
