@@ -953,3 +953,32 @@ html,body{min-height:100%;}
 body{min-height:100vh;display:flex;flex-direction:column;}
 body>main,body>.about-main{flex:1 0 auto;}
 body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
+
+
+/* Mobile ad sizing and spacing: keep native creatives inside the viewport. */
+@media (max-width: 600px) {
+  .cv-native-ad {
+    width: calc(100% - 24px);
+    max-width: 420px;
+    margin: 10px auto 14px;
+    padding: 0;
+    overflow: hidden;
+  }
+  .cv-native-ad-label {
+    margin-bottom: 5px;
+    font-size: 8px;
+  }
+  #container-6e2d91a6ad04321640ed7203cf20f430 {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+  #container-6e2d91a6ad04321640ed7203cf20f430 iframe,
+  #container-6e2d91a6ad04321640ed7203cf20f430 img {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 0;
+  }
+}
