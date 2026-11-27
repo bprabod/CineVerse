@@ -594,3 +594,52 @@
 .release-countdown-inline{display:inline-block;padding:4px 7px;border-radius:3px;background:rgba(229,9,20,.16);border:1px solid rgba(229,9,20,.55);color:#ff777d;font-size:10px;font-weight:800;letter-spacing:.35px}
 .release-countdown-detail{display:inline-block;margin:12px 0 0;padding:9px 12px;border:1px solid rgba(229,9,20,.55);border-radius:5px;background:rgba(229,9,20,.12);color:#ff777d;font-size:12px;font-weight:800;letter-spacing:.45px}
 .release-countdown-detail[hidden]{display:none}
+
+
+/* Auth recovery action: reveal only after an invalid sign-in and match CineVerse styling. */
+#modePrompt{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+  margin-top:18px;
+  color:rgba(255,255,255,.72);
+  font-size:13px;
+}
+#modePrompt .auth-create-prompt{display:block}
+#modePrompt a:not(.forgot-password-action){
+  color:#fff;
+  font-weight:700;
+  text-decoration:none;
+}
+#modePrompt a:not(.forgot-password-action):hover{color:#ff555d}
+#modePrompt .forgot-password-action{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:40px;
+  padding:0 17px;
+  border:1px solid rgba(229,9,20,.65);
+  border-radius:5px;
+  background:linear-gradient(135deg,rgba(229,9,20,.2),rgba(229,9,20,.08));
+  color:#ff777d;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.35px;
+  text-decoration:none;
+  box-shadow:0 4px 16px rgba(229,9,20,.12);
+  transition:background .2s ease,border-color .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+#modePrompt .forgot-password-action::before{
+  content:"↻";
+  margin-right:8px;
+  font-size:16px;
+  line-height:1;
+}
+#modePrompt .forgot-password-action:hover{
+  background:rgba(229,9,20,.24);
+  border-color:#e50914;
+  color:#fff;
+  transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(229,9,20,.22);
+}
