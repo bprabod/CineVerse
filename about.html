@@ -59,10 +59,14 @@
       <p>CineVerse is an independent discovery platform. Movie and TV information, artwork and related materials may be provided by third-party sources and remain the property of their respective owners. Availability of any title or playback feature may vary.</p>
     </aside>
   </main>
-  <footer class="about-footer">
-    <span>© <span id="aboutYear"></span> CineVerse. Made for movie lovers.</span>
-    <a href="index.html">Explore CineVerse →</a>
-  </footer>
-  <script>document.getElementById("aboutYear").textContent = new Date().getFullYear();</script>
+  <footer class="site-footer">
+  <a class="brand" href="index.html">CINE<span>VERSE</span></a>
+  <p>A universe of stories. A world of discovery.</p>
+  <div class="footer-bottom">
+    <span>© <span class="cineverse-year"></span> CineVerse. Made for movie lovers.</span>
+    <div class="footer-links"><a href="about.html">About CineVerse</a><a href="index.html#top">Back to top ↑</a></div>
+  </div>
+</footer>
+<script>document.querySelectorAll(".cineverse-year").forEach(el => el.textContent = new Date().getFullYear());</script>
 </body>
 </html>
