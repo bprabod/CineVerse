@@ -51,7 +51,7 @@
     @media(max-width:390px){.account-page .member-site-header{flex-wrap:wrap}.account-page .member-site-header .main-nav{order:3;flex-basis:100%;padding:3px 0 5px}.account-page .member-site-header .header-actions{margin-left:auto}}
 
 
-    .account-page .support-section{margin:36px 0 40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1)}
+    .account-page .support-section[hidden],.account-page .support-quick-link[hidden]{display:none!important}\n    .account-page .support-section{margin:36px 0 40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1)}
     .account-page .support-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
     .account-page .support-heading h2{margin:0;font-size:25px;letter-spacing:-.7px}
     .account-page .support-card{padding:18px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:rgba(255,255,255,.025)}
@@ -116,7 +116,7 @@
       </div>
       <div class="detail-actions">
         <a class="button button-primary" href="watchlist.html">Open Watchlist</a>
-        <a class="button button-secondary" href="#supportHeading">Contact Admin</a>
+        <a class="button button-secondary support-quick-link" href="#supportHeading" hidden>Contact Admin</a>
       </div>
       <p id="accountStatus" class="detail-status" role="status"></p>
     </section>
@@ -142,7 +142,7 @@
     </section>
 
 
-    <section class="support-section" aria-labelledby="supportHeading">
+    <section class="support-section" aria-labelledby="supportHeading" hidden>
       <div class="support-heading">
         <div><p class="section-kicker">NEED A HAND?</p><h2 id="supportHeading">Contact Admin</h2></div>
       </div>
