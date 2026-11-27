@@ -1050,3 +1050,25 @@ body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
 .reviews-panel .review-actions button{font-size:9px}
 .reviews-panel .reviews-empty{padding:10px 0;font-size:11px}
 @media(max-width:600px){.reviews-heading-actions{gap:8px}.reviews-toggle-button{padding:8px 10px;font-size:10px}.reviews-average{font-size:20px}.reviews-panel .review-item{padding:9px 10px}}
+
+
+/* Netflix-inspired collapsible community reviews */
+.reviews-heading{display:block!important;margin:0!important}
+.reviews-accordion-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:19px 22px;text-align:left;color:#fff;background:linear-gradient(105deg,#202020 0%,#151515 68%,#101010 100%);border:1px solid rgba(255,255,255,.11);border-radius:9px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.reviews-accordion-trigger:hover{background:linear-gradient(105deg,#292929,#191919);border-color:rgba(255,255,255,.25)}
+.reviews-accordion-copy{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.reviews-accordion-copy .section-kicker{margin:0;color:#e50914;font-size:9px;letter-spacing:2px}
+.reviews-accordion-title{font-size:20px;font-weight:750;letter-spacing:-.45px}
+.reviews-accordion-subtitle{color:#929292;font-size:11px}
+.reviews-accordion-meta{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.reviews-accordion-meta .reviews-average{font-size:19px;font-weight:800;color:#fff}
+.reviews-accordion-meta .reviews-average span{font-size:10px;color:#888;font-weight:500}
+.reviews-chevron{display:grid;place-items:center;width:29px;height:29px;border:1px solid rgba(255,255,255,.16);border-radius:50%;color:#ddd;font-size:19px;line-height:1;transition:transform .22s,background .22s}
+.reviews-accordion-trigger.is-open .reviews-chevron{transform:rotate(180deg);background:#e50914;border-color:#e50914;color:#fff}
+.reviews-panel[hidden]{display:none!important}
+.reviews-panel{padding:17px 2px 0;animation:reviewsPanelReveal .22s ease-out}
+@keyframes reviewsPanelReveal{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.reviews-panel-actions{display:flex;justify-content:flex-end;margin:0 0 12px}
+.reviews-write-button{min-height:36px;padding:9px 14px;font-size:11px;border-radius:5px}
+.reviews-panel .reviews-summary{margin:0 0 12px;color:#999;font-size:11px}
+@media(max-width:600px){.reviews-accordion-trigger{padding:15px 13px;gap:10px}.reviews-accordion-title{font-size:17px}.reviews-accordion-subtitle{font-size:9px}.reviews-accordion-meta{gap:9px}.reviews-accordion-meta .reviews-average{font-size:16px}.reviews-chevron{width:25px;height:25px}.reviews-panel-actions{justify-content:stretch}.reviews-write-button{width:100%}}
