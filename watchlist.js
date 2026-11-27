@@ -1,6 +1,35 @@
 const statusEl = document.getElementById("listStatus");
 const grid = document.getElementById("savedTitles");
 const posterFallback = "https://placehold.co/500x750/171717/eeeeee?text=CineVerse";
+const TMDB_PROXY = "https://suckecjeyzlpbpkspmau.supabase.co/functions/v1/tmdb-proxy";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_-re693K9MBweYpZjW01fRQ_m-nXuhy1";
+function releaseCountdownHTML(dateValue) {
+  return formatReleaseCountdown(dateValue) ? '<span class="release-countdown-inline" data-release-countdown="' + escapeHtml(dateValue) + '"></span>' : '';
+}
+function formatReleaseCountdown(dateValue) {
+  const match = String(dateValue || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return '';
+  const target = new Date(Number(match[1]), Number(match[2])-1, Number(match[3]));
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.floor((target.getTime()-today.getTime())/86400000);
+  if (days < 0) return '';
+  if (days === 0) return 'RELEASES TODAY';
+  const remaining = Math.max(0, target.getTime()-now.getTime());
+  const d = Math.floor(remaining/86400000);
+  const h = Math.floor((remaining%86400000)/3600000);
+  const m = Math.floor((remaining%3600000)/60000);
+  const s = Math.floor((remaining%60000)/1000);
+  return d + 'd : ' + String(h).padStart(2,'0') + 'h : ' + String(m).padStart(2,'0') + 'm : ' + String(s).padStart(2,'0') + 's';
+}
+function refreshReleaseCountdowns() {
+  document.querySelectorAll('[data-release-countdown]').forEach(node => {
+    const value = formatReleaseCountdown(node.dataset.releaseCountdown);
+    if (!value) { node.hidden = true; return; }
+    node.hidden = false; node.textContent = value;
+  });
+}
+setInterval(refreshReleaseCountdowns, 1000);
 
 function escapeText(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -29,6 +58,7 @@ function renderWatchlist(items) {
         <img class="poster" loading="lazy" src="${escapeText(item.poster_url || posterFallback)}" alt="Poster for ${escapeText(item.title)}" onerror="this.src='${posterFallback}'">
         <div class="card-gradient"></div>
         <span class="card-top">${item.media_type === "tv" ? "SERIES" : "TMDB"}</span>
+        ${item.release_date ? '<span class="release-countdown-badge" data-release-countdown="' + escapeText(item.release_date) + '"></span>' : ''}
         <div class="card-info"><h3>${escapeText(item.title)}</h3>
           <p>${item.media_type === "tv" ? "TV Series" : "Movie"}</p></div>
       </a>
@@ -44,7 +74,17 @@ async function loadWatchlist() {
     const { data, error } = await cvSupabase.from("watchlist")
       .select("*").eq("user_id", user.id).order("created_at", { ascending: false });
     if (error) throw error;
-    renderWatchlist(data || []);
+    const withReleaseDates = await Promise.all((data || []).map(async item => {
+      try {
+        const query = new URLSearchParams({ path: `/${item.media_type === "tv" ? "tv" : "movie"}/${item.tmdb_id}` });
+        const response = await fetch(`${TMDB_PROXY}?${query}`, { headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Accept: "application/json" } });
+        if (!response.ok) return item;
+        const detail = await response.json();
+        return { ...item, release_date: detail.release_date || detail.first_air_date || "" };
+      } catch (_) { return item; }
+    }));
+    renderWatchlist(withReleaseDates);
+    refreshReleaseCountdowns();
   } catch (error) {
     statusEl.textContent = "Could not load your Watchlist: " + (error.message || "Please refresh and try again.");
   }
