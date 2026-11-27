@@ -43,7 +43,7 @@ async function getCurrentUser() {
   if (!user) {
     document.getElementById("signOut").hidden = true;
     document.getElementById("signIn").hidden = false;
-    statusEl.textContent = "Sign in to view your Watchlist.";
+    statusEl.innerHTML = '<span class="watchlist-signin-title">Sign in required</span><span class="watchlist-signin-copy">Please sign in to view and manage your Watchlist.</span><a class="watchlist-signin-link" href="auth.html">Sign in to CineVerse</a>';
     grid.innerHTML = "";
     return null;
   }
@@ -66,7 +66,7 @@ function renderWatchlist(items) {
         <img class="poster" loading="lazy" src="${escapeText(item.poster_url || posterFallback)}" alt="Poster for ${escapeText(item.title)}" onerror="this.src='${posterFallback}'">
         <div class="card-gradient"></div>
         <span class="card-top">${item.media_type === "tv" ? "SERIES" : "TMDB"}</span>
-        ${item.release_date ? '<span class="release-countdown-badge" data-release-countdown="' + escapeText(item.release_date) + '"></span>' : ''}
+        ${formatReleaseCountdown(item.release_date) ? '<span class="release-countdown-badge" data-release-countdown="' + escapeText(item.release_date) + '"></span>' : ''}
         <div class="card-info"><h3>${escapeText(item.title)}</h3>
           <p>${item.media_type === "tv" ? "TV Series" : "Movie"}</p></div>
       </a>
