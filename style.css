@@ -760,47 +760,28 @@
 }
 
 
-/* Single password visibility control */
-.password-field{position:relative;width:100%;min-width:0}
-.password-field input{box-sizing:border-box;width:100%;padding-right:66px!important}
+/* Password visibility control — clean text-button design */
+.password-field{position:relative;display:block;width:100%;min-width:0}
+.password-field input{box-sizing:border-box;width:100%;padding-right:72px!important}
 .password-field .password-visibility-toggle{
- position:absolute;right:12px;top:50%;transform:translateY(-50%);
- padding:5px 3px;border:0;background:transparent;color:rgba(255,255,255,.58);
- font:600 11px/1 inherit;letter-spacing:.2px;cursor:pointer;transition:color .16s ease;
+  position:absolute;top:50%;right:12px;transform:translateY(-50%);
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:42px;height:26px;margin:0;padding:0 9px;
+  border:1px solid rgba(255,255,255,.16);border-radius:5px;
+  background:rgba(255,255,255,.06);color:#d8d8d8;
+  font:600 11px/1 inherit;letter-spacing:.25px;cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
 }
-.password-field .password-visibility-toggle:hover,
-.password-field .password-visibility-toggle:focus-visible{color:#ff5b64;outline-offset:3px}
+.password-field .password-visibility-toggle:hover{
+  background:rgba(229,9,20,.14);border-color:rgba(229,9,20,.55);color:#fff;
+}
+.password-field .password-visibility-toggle:focus-visible{outline:2px solid #e50914;outline-offset:2px}
 .password-field[hidden]{display:none!important}
-
-/* Keep mutually exclusive account actions hidden in flex headers */
 .header-actions [hidden]{display:none!important}
-/* Compact eye icon for password visibility */
-.password-field .password-visibility-toggle{
- width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
- display:flex!important;align-items:center!important;justify-content:center!important;
- position:absolute!important;right:8px!important;top:50%!important;transform:translateY(-50%)!important;
- z-index:3!important;opacity:1!important;visibility:visible!important;
- padding:0!important;border:0!important;background:transparent!important;color:#bdbdbd!important;
- cursor:pointer!important;font-size:0!important;line-height:1!important;
-}
-.password-field .password-visibility-toggle svg{display:block!important;width:19px!important;height:19px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 
+/* END password visibility control */
 /* Watchlist guest sign-in notice */
 .watchlist-signin-title{display:block;color:#fff;font-size:18px;font-weight:750;margin-bottom:7px}
 .watchlist-signin-copy{display:block;color:rgba(255,255,255,.68);font-size:13px;margin-bottom:14px}
 .watchlist-signin-link{display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:4px;background:var(--red,#e50914);color:#fff;text-decoration:none;font-size:12px;font-weight:750}
 .watchlist-signin-link:hover{filter:brightness(1.12)}
-
-
-/* Password controls: use Show/Hide text, not the legacy eye-icon styling */
-.password-field .password-visibility-toggle{
-  width:auto!important;
-  min-width:38px!important;
-  min-height:30px!important;
-  height:30px!important;
-  padding:0 4px!important;
-  font-size:12px!important;
-  line-height:1!important;
-  color:#d0d0d0!important;
-}
-.password-field .password-visibility-toggle svg{display:none!important}
