@@ -378,3 +378,21 @@
 /* Make the sign-up mode link clearly visible on the auth page */
 #modePrompt a{color:#ff4b55;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;font-weight:700;cursor:pointer;transition:color .2s ease}
 #modePrompt a:hover,#modePrompt a:focus-visible{color:#fff;text-decoration-thickness:2px;outline-offset:3px}
+
+/* Shared full navigation for account and My List pages */
+.member-site-header{
+  position:sticky;top:0;left:auto;right:auto;height:auto;min-height:76px;
+  padding:0 6.2%;display:grid;grid-template-columns:auto 1fr auto;
+  grid-template-rows:76px;align-items:center;gap:28px;
+  background:rgba(9,9,9,.97);border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px);
+}
+.member-site-header .main-nav{display:flex;gap:clamp(12px,2.2vw,28px);flex-wrap:nowrap;white-space:nowrap}
+.member-site-header .header-actions{margin-left:0}
+@media(max-width:760px){
+ .member-site-header{grid-template-columns:1fr auto;grid-template-rows:58px 42px;gap:0 12px;padding:0 5%}
+ .member-site-header .brand{grid-column:1;grid-row:1;font-size:20px}
+ .member-site-header .header-actions{grid-column:2;grid-row:1}
+ .member-site-header .main-nav{grid-column:1/-1;grid-row:2;width:100%;overflow-x:auto;gap:22px;padding:0 0 10px;font-size:11px;scrollbar-width:none}
+ .member-site-header .main-nav::-webkit-scrollbar{display:none}
+}
