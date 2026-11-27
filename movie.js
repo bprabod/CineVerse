@@ -2,7 +2,6 @@ const SUPABASE_URL = "https://suckecjeyzlpbpkspmau.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_-re693K9MBweYpZjW01fRQ_m-nXuhy1";
 const TMDB_PROXY = `${SUPABASE_URL}/functions/v1/tmdb-proxy`;
 const IMAGE_BASE = "https://image.tmdb.org/t/p/";
-const NEXSTREAM_API_KEY = "nx_73737077fdaf1355551e14c7f105f427";
 const NEXSTREAM_MOVIE_EMBED = "https://api.codespecters.com/embed/movie/";
 const NEXSTREAM_TV_EMBED = "https://api.codespecters.com/embed/tv/";
 const params = new URLSearchParams(location.search);
@@ -48,6 +47,34 @@ function goBack() {
 }
 const backButton = $("backButton");
 if (backButton) backButton.addEventListener("click", goBack);
+
+
+let cachedNexstreamApiKey = null;
+let nexstreamApiKeyRequest = null;
+
+async function getNexstreamApiKey() {
+  if (cachedNexstreamApiKey) return cachedNexstreamApiKey;
+  if (!nexstreamApiKeyRequest) {
+    nexstreamApiKeyRequest = (async () => {
+      const endpoint = new URL(`${SUPABASE_URL}/rest/v1/cineverse_streaming_config`);
+      endpoint.searchParams.set("id", "eq.1");
+      endpoint.searchParams.set("select", "api_key");
+      const response = await fetch(endpoint.toString(), {
+        headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Accept: "application/json" }
+      });
+      const rows = await response.json().catch(() => []);
+      if (!response.ok || !Array.isArray(rows) || !rows[0]?.api_key) {
+        throw new Error("Streaming is temporarily unavailable. Please contact the CineVerse administrator.");
+      }
+      cachedNexstreamApiKey = rows[0].api_key;
+      return cachedNexstreamApiKey;
+    })().catch(error => {
+      nexstreamApiKeyRequest = null;
+      throw error;
+    });
+  }
+  return nexstreamApiKeyRequest;
+}
 
 async function tmdb(path, extra = {}) {
   const query = new URLSearchParams({ path, ...extra });
@@ -473,8 +500,11 @@ $("playButton").addEventListener("click", async () => {
     $("seasonSelect").focus();
     return;
   }
+  let apiKey;
+  try { apiKey = await getNexstreamApiKey(); }
+  catch (error) { $("detailStatus").textContent = error.message; return; }
   const playerUrl = new URL(`${NEXSTREAM_MOVIE_EMBED}${encodeURIComponent(id)}`);
-  playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
+  playerUrl.searchParams.set("apikey", apiKey);
   $("playerFrame").src = playerUrl.toString();
   await recordRecentWatch(currentTitle, type);
   $("playerHeading").textContent = `Now playing · ${currentTitle.title || currentTitle.name || "Movie"}`;
@@ -488,8 +518,11 @@ $("playEpisodeButton").addEventListener("click", async () => {
   if (!episodeNumber) return;
   const episode = currentEpisodes.find(item => Number(item.episode_number) === episodeNumber);
   if (!episode) return;
+  let apiKey;
+  try { apiKey = await getNexstreamApiKey(); }
+  catch (error) { $("detailStatus").textContent = error.message; return; }
   const playerUrl = new URL(`${NEXSTREAM_TV_EMBED}${encodeURIComponent(id)}/${selectedSeason}/${episodeNumber}`);
-  playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
+  playerUrl.searchParams.set("apikey", apiKey);
   $("playerFrame").src = playerUrl.toString();
   await recordRecentWatch(currentTitle, type, `${currentTitle.name || currentTitle.title || "Series"} · S${selectedSeason} E${episodeNumber}`);
   $("playerHeading").textContent = `Now playing · S${String(selectedSeason).padStart(2, "0")} E${String(episodeNumber).padStart(2, "0")} — ${episode.name || "Episode"}`;
