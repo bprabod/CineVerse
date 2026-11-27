@@ -247,6 +247,7 @@ async function loadReviews() {
     $("reviewForm").hidden = !user;
     const ownReview = user && reviewRows.find(item => item.user_id === user.id);
     if (ownReview) {
+      editingReviewId = ownReview.id;
       $("reviewFormHeading").textContent = "Your review";
       $("submitReview").textContent = "Edit your review";
       $("reviewText").value = ownReview.review_text;
