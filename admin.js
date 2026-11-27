@@ -73,11 +73,20 @@ async function loadAdminDashboard(user) {
     return;
   }
 
+  currentAdminUser = user;
   document.body.classList.remove("admin-locked");
   adminStatus.textContent = "Administrator access verified.";
   adminStats.hidden = false;
   adminTools.hidden = false;
   await Promise.all([loadMembers(), loadReviews()]);
+  document.getElementById("adminInboxPanel").hidden = false;
+  try {
+    await loadSupportInbox();
+  } catch (inboxError) {
+    console.warn("Could not load Contact Admin inbox:", inboxError);
+    document.getElementById("adminInboxList").innerHTML = '<p class="admin-empty">Inbox is temporarily unavailable.</p>';
+    document.getElementById("adminInboxStatus").textContent = inboxError.message || "Could not load messages.";
+  }
 }
 
 memberSearch.addEventListener("input", () => renderMembers(memberSearch.value));
@@ -123,4 +132,153 @@ adminSignOut.addEventListener("click", async () => {
     return;
   }
   location.replace("auth.html");
+});
+
+
+/* Private Contact Admin inbox — access is enforced by Supabase RLS. */
+let currentAdminUser = null;
+let adminSupportThreads = [];
+let selectedAdminThread = null;
+
+function adminSupportEscape(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[ch]));
+}
+
+async function loadSupportInbox() {
+  const list = document.getElementById("adminInboxList");
+  const { data: threads, error: threadError } = await cvSupabase.from("cineverse_support_threads")
+    .select("id,user_id,subject,status,created_at")
+    .order("created_at", { ascending:false })
+    .limit(150);
+  if (threadError) throw threadError;
+  adminSupportThreads = threads || [];
+  document.getElementById("adminInboxCount").textContent = adminSupportThreads.length + " THREADS";
+  if (!adminSupportThreads.length) {
+    list.innerHTML = '<p class="admin-empty">No member messages yet.</p>';
+    document.getElementById("adminInboxConversation").hidden = true;
+    return;
+  }
+
+  const userIds = [...new Set(adminSupportThreads.map(thread => thread.user_id))];
+  const threadIds = adminSupportThreads.map(thread => thread.id);
+  const [profileResult, messageResult] = await Promise.all([
+    cvSupabase.from("profiles").select("id,username").in("id", userIds),
+    cvSupabase.from("cineverse_support_messages").select("thread_id,body,sender_role,created_at")
+      .in("thread_id", threadIds).order("created_at", { ascending:false }).limit(500)
+  ]);
+  if (profileResult.error) throw profileResult.error;
+  if (messageResult.error) throw messageResult.error;
+  const names = new Map((profileResult.data || []).map(profile => [profile.id, profile.username]));
+  const latest = new Map();
+  (messageResult.data || []).forEach(message => {
+    if (!latest.has(message.thread_id)) latest.set(message.thread_id, message);
+  });
+
+  list.innerHTML = adminSupportThreads.map(thread => {
+    const date = new Date(thread.created_at);
+    const dateLabel = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(undefined,{day:"numeric",month:"short"});
+    const last = latest.get(thread.id);
+    return '<button type="button" class="admin-inbox-thread' +
+      (selectedAdminThread?.id === thread.id ? ' is-active' : '') +
+      '" data-admin-thread="' + adminSupportEscape(thread.id) + '"><strong>' +
+      adminSupportEscape(thread.subject) + '</strong><small>' +
+      adminSupportEscape(names.get(thread.user_id) || "CineVerse member") + ' · ' +
+      adminSupportEscape(dateLabel) + ' · ' + adminSupportEscape(thread.status.toUpperCase()) +
+      '</small><p>' + adminSupportEscape(last?.body || "No messages") + '</p></button>';
+  }).join("");
+
+  if (!selectedAdminThread || !adminSupportThreads.some(thread => thread.id === selectedAdminThread.id)) {
+    await openAdminSupportThread(adminSupportThreads[0].id);
+  } else {
+    selectedAdminThread = adminSupportThreads.find(thread => thread.id === selectedAdminThread.id);
+    await renderAdminSupportThread();
+  }
+}
+
+async function openAdminSupportThread(threadId) {
+  selectedAdminThread = adminSupportThreads.find(thread => thread.id === threadId) || null;
+  if (!selectedAdminThread) return;
+  document.querySelectorAll("[data-admin-thread]").forEach(button => {
+    button.classList.toggle("is-active", button.dataset.adminThread === threadId);
+  });
+  await renderAdminSupportThread();
+}
+
+async function renderAdminSupportThread() {
+  if (!selectedAdminThread) return;
+  const panel = document.getElementById("adminInboxConversation");
+  const messagesEl = document.getElementById("adminInboxMessages");
+  panel.hidden = false;
+  const { data, error } = await cvSupabase.from("cineverse_support_messages")
+    .select("id,sender_role,body,created_at")
+    .eq("thread_id", selectedAdminThread.id)
+    .order("created_at", { ascending:true });
+  if (error) throw error;
+  messagesEl.innerHTML = '<h3 style="margin:0 0 12px;font-size:14px">' +
+    adminSupportEscape(selectedAdminThread.subject) + '</h3>' +
+    (data || []).map(message => {
+      const date = new Date(message.created_at);
+      const dateLabel = Number.isNaN(date.getTime()) ? "" : date.toLocaleString();
+      const isAdmin = message.sender_role === "admin";
+      return '<div class="admin-inbox-message' + (isAdmin ? ' is-admin' : '') + '">' +
+        adminSupportEscape(message.body) + '<small>' + (isAdmin ? "You · Admin" : "Member") +
+        ' · ' + adminSupportEscape(dateLabel) + '</small></div>';
+    }).join("");
+  const closed = selectedAdminThread.status === "closed";
+  document.getElementById("adminInboxThreadStatus").textContent = closed ? "CLOSED" : "OPEN";
+  document.getElementById("adminToggleThreadStatus").textContent = closed ? "Reopen conversation" : "Close conversation";
+  document.getElementById("adminInboxReplyForm").hidden = closed;
+}
+
+document.getElementById("adminInboxList")?.addEventListener("click", async event => {
+  const button = event.target.closest("[data-admin-thread]");
+  if (!button) return;
+  try { await openAdminSupportThread(button.dataset.adminThread); }
+  catch (error) { document.getElementById("adminInboxStatus").textContent = error.message || "Could not open this conversation."; }
+});
+
+document.getElementById("adminInboxReplyForm")?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentAdminUser || !selectedAdminThread || selectedAdminThread.status !== "open") return;
+  const input = document.getElementById("adminInboxReplyText");
+  const button = document.getElementById("adminInboxReplyButton");
+  const body = input.value.trim();
+  if (!body) return;
+  button.disabled = true;
+  try {
+    const { error } = await cvSupabase.from("cineverse_support_messages").insert({
+      thread_id:selectedAdminThread.id,
+      sender_id:currentAdminUser.id,
+      sender_role:"admin",
+      body
+    });
+    if (error) throw error;
+    input.value = "";
+    document.getElementById("adminInboxStatus").textContent = "Reply sent.";
+    const threadId = selectedAdminThread.id;
+    await loadSupportInbox();
+    await openAdminSupportThread(threadId);
+  } catch (error) {
+    document.getElementById("adminInboxStatus").textContent = error.message || "Could not send reply.";
+  } finally { button.disabled = false; }
+});
+
+document.getElementById("adminToggleThreadStatus")?.addEventListener("click", async () => {
+  if (!selectedAdminThread) return;
+  const nextStatus = selectedAdminThread.status === "closed" ? "open" : "closed";
+  const button = document.getElementById("adminToggleThreadStatus");
+  button.disabled = true;
+  try {
+    const { error } = await cvSupabase.from("cineverse_support_threads")
+      .update({ status:nextStatus }).eq("id", selectedAdminThread.id);
+    if (error) throw error;
+    document.getElementById("adminInboxStatus").textContent = "Conversation " + nextStatus + ".";
+    const threadId = selectedAdminThread.id;
+    await loadSupportInbox();
+    await openAdminSupportThread(threadId);
+  } catch (error) {
+    document.getElementById("adminInboxStatus").textContent = error.message || "Could not update conversation.";
+  } finally { button.disabled = false; }
 });
