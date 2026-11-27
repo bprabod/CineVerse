@@ -23,15 +23,17 @@ function renderWatchlist(items) {
   }
   statusEl.textContent = "";
   grid.innerHTML = items.map(item => `
-    <article class="watchlist-card">
-      <a class="watchlist-poster-link" href="movie.html?id=${encodeURIComponent(item.tmdb_id)}&type=${encodeURIComponent(item.media_type)}">
+    <article class="movie-card watchlist-card">
+      <a class="watchlist-poster-link" href="movie.html?id=${encodeURIComponent(item.tmdb_id)}&type=${encodeURIComponent(item.media_type)}"
+        aria-label="View details for ${escapeText(item.title)}">
         <img class="poster" loading="lazy" src="${escapeText(item.poster_url || posterFallback)}" alt="Poster for ${escapeText(item.title)}" onerror="this.src='${posterFallback}'">
-        <div class="card-gradient"></div><div class="card-info">
-          <h3>${escapeText(item.title)}</h3><p>${item.media_type === "tv" ? "TV Series" : "Movie"}</p>
-        </div>
+        <div class="card-gradient"></div>
+        <span class="card-top">${item.media_type === "tv" ? "SERIES" : "TMDB"}</span>
+        <div class="card-info"><h3>${escapeText(item.title)}</h3>
+          <p>${item.media_type === "tv" ? "TV Series" : "Movie"}</p></div>
       </a>
-      <button class="button button-secondary remove-title" data-id="${escapeText(item.id)}" type="button"
-        aria-label="Remove ${escapeText(item.title)} from Watchlist">Remove</button>
+      <button class="watchlist-remove remove-title" data-id="${escapeText(item.id)}" type="button"
+        aria-label="Remove ${escapeText(item.title)} from Watchlist" title="Remove from Watchlist">×</button>
     </article>`).join("");
 }
 
