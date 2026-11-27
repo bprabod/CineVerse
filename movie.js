@@ -264,6 +264,15 @@ async function loadReviews() {
   }
 }
 
+$("toggleReviews").addEventListener("click", () => {
+  const panel = $("reviewsPanel");
+  const opening = panel.hidden;
+  panel.hidden = !opening;
+  $("toggleReviews").setAttribute("aria-expanded", String(opening));
+  $("toggleReviews").textContent = opening ? "Hide reviews" : "Add a review";
+  if (opening) panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
 $("reviewRatingPicker").addEventListener("click", event => {
   const button = event.target.closest("[data-rating]");
   if (button) setReviewRating(button.dataset.rating);
@@ -324,6 +333,7 @@ $("reviewsList").addEventListener("click", async event => {
   const review = reviewRows.find(item => String(item.id) === button.dataset.reviewId && item.user_id === reviewUser.id);
   if (!review) return;
   if (button.dataset.reviewAction === "edit") {
+    if ($("reviewsPanel").hidden) $("toggleReviews").click();
     editingReviewId = review.id;
     $("reviewFormHeading").textContent = "Edit your review";
     $("submitReview").textContent = "Save changes";
