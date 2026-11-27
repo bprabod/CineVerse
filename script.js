@@ -300,18 +300,23 @@ async function syncDialogWatchButton() {
 
 async function recordDialogRecentWatch(movie) {
   try {
-    const { data: { user } } = await cvSupabase.auth.getUser();
-    if (!user || !movie) return;
+    await window.cvAuthReady;
+    if (!movie) return;
+    const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
+    if (authError) throw authError;
+    if (!user) return;
+    const tmdbId = Number(movie.id);
+    if (!Number.isFinite(tmdbId) || tmdbId <= 0) throw new Error("Invalid TMDB title ID.");
     const { error } = await cvSupabase.from("watch_history").upsert({
       user_id: user.id,
-      tmdb_id: Number(movie.id),
-      media_type: movie.type,
-      title: movie.title,
-      poster_url: movie.image,
+      tmdb_id: tmdbId,
+      media_type: movie.type === "tv" ? "tv" : "movie",
+      title: movie.title || "Untitled",
+      poster_url: movie.image || FALLBACK_POSTER,
       last_watched_at: new Date().toISOString()
     }, { onConflict: "user_id,tmdb_id,media_type" });
-    if (error) console.warn("Could not save recent watch:", error);
-  } catch (error) { console.warn("Could not save recent watch:", error); }
+    if (error) throw error;
+  } catch (error) { console.error("Could not save recent watch:", error); }
 }
 
 async function openMovie(id, type) {
@@ -362,7 +367,7 @@ $("dialogPlay").addEventListener("click", () => {
   const playerUrl = new URL(`${NEXSTREAM_EMBED}${encodeURIComponent(activeMovie.id)}`);
   playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
   streamFrame.src = playerUrl.toString();
-  recordDialogRecentWatch(activeMovie);
+  void recordDialogRecentWatch(activeMovie);
   streamPlayer.hidden = false;
   streamPlayer.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
