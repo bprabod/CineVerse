@@ -143,8 +143,20 @@ async function showHeroSlide(index) {
   } catch (error) { console.warn('Featured slide image failed:', error); return; }
   if (transitionToken !== heroTransitionToken) return;
   const words = (movie.title || 'Featured movie').trim().split(/\s+/);
-  const first = words.length > 1 ? words.slice(0, -1).join(' ') : words[0];
-  const last = words.length > 1 ? words[words.length - 1] : '';
+  const isLongTitle = words.join(' ').length > 22;
+  let splitAt = words.length;
+  if (isLongTitle && words.length > 2) {
+    const midpoint = words.join(' ').length / 2;
+    let running = 0;
+    let bestDistance = Infinity;
+    for (let i = 1; i < words.length; i++) {
+      running += words[i - 1].length + (i > 1 ? 1 : 0);
+      const distance = Math.abs(running - midpoint);
+      if (distance < bestDistance) { bestDistance = distance; splitAt = i; }
+    }
+  }
+  const first = words.slice(0, splitAt).join(' ');
+  const last = words.slice(splitAt).join(' ');
   const heroImage = document.querySelector('.hero-image');
   const heroContentElement = document.querySelector('.hero-content');
   heroImage?.classList.add('is-changing');
@@ -161,7 +173,10 @@ async function showHeroSlide(index) {
     const meta = document.querySelector('.hero-meta');
     if (eyebrow) eyebrow.innerHTML = '<span class="live-dot"></span> FEATURED MOVIE';
     if (kicker) kicker.textContent = 'NOW SHOWING ON CINEVERSE';
-    if (title) title.innerHTML = `${escapeHtml(first)}${last ? `<br><span>${escapeHtml(last)}</span>` : ''}`;
+    if (title) {
+      title.classList.toggle('is-long-title', isLongTitle);
+      title.innerHTML = `${escapeHtml(first)}${last ? `<br><span>${escapeHtml(last)}</span>` : ''}`;
+    }
     if (description) description.textContent = movie.overview || 'Discover this featured movie on CineVerse.';
     if (meta) {
       const year = (movie.release_date || '').slice(0, 4);
