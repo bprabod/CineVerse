@@ -177,6 +177,179 @@ async function syncDetailWatchlistButton() {
   }
 }
 
+
+let reviewUser = null;
+let reviewRows = [];
+let selectedReviewRating = 5;
+let editingReviewId = null;
+
+function setReviewRating(value) {
+  selectedReviewRating = Math.max(1, Math.min(5, Number(value) || 5));
+  document.querySelectorAll("#reviewRatingPicker [data-rating]").forEach(button => {
+    const active = Number(button.dataset.rating) <= selectedReviewRating;
+    button.classList.toggle("is-selected", active);
+    button.setAttribute("aria-pressed", String(Number(button.dataset.rating) === selectedReviewRating));
+  });
+}
+
+function renderReviewRows() {
+  const list = $("reviewsList");
+  if (!list) return;
+  if (!reviewRows.length) {
+    list.innerHTML = '<p class="reviews-empty">No reviews yet. Be the first CineVerse member to share your thoughts.</p>';
+    return;
+  }
+  list.innerHTML = reviewRows.map(review => {
+    const date = new Date(review.updated_at || review.created_at);
+    const dateLabel = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(undefined, {day:"numeric",month:"short",year:"numeric"});
+    const isMine = reviewUser && review.user_id === reviewUser.id;
+    const stars = "★".repeat(Number(review.rating)) + "☆".repeat(5 - Number(review.rating));
+    return `<article class="review-item">
+      <div class="review-item-top">
+        <div><strong class="review-author">${escapeHtml(review.reviewer_name || "CineVerse member")}</strong>${isMine ? '<span class="review-you">YOU</span>' : ''}<span class="review-date">${escapeHtml(dateLabel)}</span></div>
+        <span class="review-stars" aria-label="${Number(review.rating)} out of 5 stars">${stars}</span>
+      </div>
+      <p class="review-body">${escapeHtml(review.review_text)}</p>
+      ${isMine ? `<div class="review-actions"><button type="button" data-review-action="edit" data-review-id="${review.id}">Edit</button><button type="button" data-review-action="delete" data-review-id="${review.id}">Delete</button></div>` : ''}
+    </article>`;
+  }).join("");
+}
+
+function resetReviewForm() {
+  editingReviewId = null;
+  $("reviewForm").reset();
+  $("reviewFormHeading").textContent = "Write your review";
+  $("submitReview").textContent = "Post review";
+  $("cancelReviewEdit").hidden = true;
+  $("reviewStatus").textContent = "";
+  $("reviewCharCount").textContent = "0 / 1000";
+  setReviewRating(5);
+}
+
+async function loadReviews() {
+  try {
+    if (window.cvAuthReady) await window.cvAuthReady;
+    const [{ data: { user }, error: authError }, { data, error }] = await Promise.all([
+      cvSupabase.auth.getUser(),
+      cvSupabase.from("title_reviews").select("id,user_id,reviewer_name,rating,review_text,created_at,updated_at")
+        .eq("tmdb_id", Number(id)).eq("media_type", type)
+        .order("created_at", {ascending:false}).limit(50)
+    ]);
+    if (authError) throw authError;
+    if (error) throw error;
+    reviewUser = user || null;
+    reviewRows = data || [];
+    const count = reviewRows.length;
+    const average = count ? reviewRows.reduce((sum, item) => sum + Number(item.rating), 0) / count : 0;
+    $("reviewsAverage").innerHTML = count ? `${average.toFixed(1)} <span>/ 5</span>` : '— <span>/ 5</span>';
+    $("reviewsSummary").textContent = count ? `${count} member review${count === 1 ? "" : "s"}` : "No member reviews yet";
+    $("reviewGuestPrompt").hidden = Boolean(user);
+    $("reviewForm").hidden = !user;
+    const ownReview = user && reviewRows.find(item => item.user_id === user.id);
+    if (ownReview) {
+      $("reviewFormHeading").textContent = "Your review";
+      $("submitReview").textContent = "Edit your review";
+      $("reviewText").value = ownReview.review_text;
+      $("reviewCharCount").textContent = `${ownReview.review_text.length} / 1000`;
+      setReviewRating(ownReview.rating);
+    } else {
+      resetReviewForm();
+    }
+    renderReviewRows();
+  } catch (error) {
+    console.error("Could not load member reviews:", error);
+    $("reviewsSummary").textContent = "Member reviews are temporarily unavailable.";
+    $("reviewsList").innerHTML = '<p class="reviews-empty">Could not load reviews. Please refresh and try again.</p>';
+  }
+}
+
+$("reviewRatingPicker").addEventListener("click", event => {
+  const button = event.target.closest("[data-rating]");
+  if (button) setReviewRating(button.dataset.rating);
+});
+
+$("reviewText").addEventListener("input", () => {
+  $("reviewCharCount").textContent = `${$("reviewText").value.length} / 1000`;
+});
+
+$("cancelReviewEdit").addEventListener("click", resetReviewForm);
+
+$("reviewForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!reviewUser) { $("reviewStatus").textContent = "Please sign in to post a review."; return; }
+  const reviewText = $("reviewText").value.trim();
+  if (reviewText.length < 5 || reviewText.length > 1000) {
+    $("reviewStatus").textContent = "Your review must be between 5 and 1000 characters.";
+    return;
+  }
+  const title = currentTitle?.title || currentTitle?.name || "Untitled";
+  const metadataName = reviewUser.user_metadata?.username || reviewUser.user_metadata?.display_name;
+  const reviewerName = String(metadataName || "CineVerse member").trim().slice(0,40);
+  const payload = {
+    user_id: reviewUser.id, tmdb_id: Number(id), media_type: type,
+    title, reviewer_name: reviewerName, rating: selectedReviewRating,
+    review_text: reviewText, updated_at: new Date().toISOString()
+  };
+  const button = $("submitReview");
+  button.disabled = true;
+  $("reviewStatus").textContent = editingReviewId ? "Updating your review…" : "Posting your review…";
+  try {
+    let result;
+    if (editingReviewId) {
+      result = await cvSupabase.from("title_reviews").update({
+        rating: payload.rating, review_text: payload.review_text,
+        title: payload.title, reviewer_name: payload.reviewer_name,
+        updated_at: payload.updated_at
+      }).eq("id", editingReviewId).eq("user_id", reviewUser.id);
+    } else {
+      result = await cvSupabase.from("title_reviews").insert(payload);
+    }
+    if (result.error) throw result.error;
+    $("reviewStatus").textContent = "Your review has been saved.";
+    await loadReviews();
+  } catch (error) {
+    console.error("Could not save member review:", error);
+    $("reviewStatus").textContent = error.code === "23505"
+      ? "You already reviewed this title. Edit your existing review instead."
+      : (error.message || "Could not save your review. Please try again.");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("reviewsList").addEventListener("click", async event => {
+  const button = event.target.closest("[data-review-action]");
+  if (!button || !reviewUser) return;
+  const review = reviewRows.find(item => String(item.id) === button.dataset.reviewId && item.user_id === reviewUser.id);
+  if (!review) return;
+  if (button.dataset.reviewAction === "edit") {
+    editingReviewId = review.id;
+    $("reviewFormHeading").textContent = "Edit your review";
+    $("submitReview").textContent = "Save changes";
+    $("cancelReviewEdit").hidden = false;
+    $("reviewText").value = review.review_text;
+    $("reviewCharCount").textContent = `${review.review_text.length} / 1000`;
+    $("reviewStatus").textContent = "";
+    setReviewRating(review.rating);
+    $("reviewForm").scrollIntoView({behavior:"smooth",block:"center"});
+    $("reviewText").focus();
+    return;
+  }
+  if (button.dataset.reviewAction === "delete") {
+    if (!confirm("Delete your review for this title?")) return;
+    button.disabled = true;
+    const { error } = await cvSupabase.from("title_reviews").delete()
+      .eq("id", review.id).eq("user_id", reviewUser.id);
+    if (error) {
+      $("reviewStatus").textContent = error.message || "Could not delete your review.";
+      button.disabled = false;
+      return;
+    }
+    resetReviewForm();
+    await loadReviews();
+  }
+});
+
 async function loadTitle() {
   if (!id || !/^\d+$/.test(id)) {
     $("detailTitle").textContent = "Title not found";
@@ -203,6 +376,7 @@ async function loadTitle() {
     document.title = `${title} — CineVerse`;
     renderExtraDetails(item);
     renderCredits(item);
+    await loadReviews();
     if (type === "tv") {
       $("playButton").textContent = "Choose an episode";
       $("tvEpisodePicker").hidden = false;
