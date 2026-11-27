@@ -766,14 +766,13 @@
 .password-field .password-visibility-toggle{
   position:absolute;top:50%;right:12px;transform:translateY(-50%);
   display:inline-flex;align-items:center;justify-content:center;
-  min-width:42px;height:26px;margin:0;padding:0 9px;
-  border:1px solid rgba(255,255,255,.16);border-radius:5px;
-  background:rgba(255,255,255,.06);color:#d8d8d8;
-  font:600 11px/1 inherit;letter-spacing:.25px;cursor:pointer;
-  transition:background .18s ease,border-color .18s ease,color .18s ease;
+  min-width:0;height:auto;margin:0;padding:2px 0;
+  border:0;border-radius:0;background:transparent;color:#d8d8d8;
+  font:600 11px/1 "DM Sans",Arial,sans-serif;letter-spacing:.25px;cursor:pointer;
+  box-shadow:none;transition:color .18s ease;
 }
 .password-field .password-visibility-toggle:hover{
-  background:rgba(229,9,20,.14);border-color:rgba(229,9,20,.55);color:#fff;
+  border:0;background:transparent;color:#fff;text-decoration:underline;text-underline-offset:3px;
 }
 .password-field .password-visibility-toggle:focus-visible{outline:2px solid #e50914;outline-offset:2px}
 .password-field[hidden]{display:none!important}
