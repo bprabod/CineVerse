@@ -1072,3 +1072,36 @@ body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
 .reviews-write-button{min-height:36px;padding:9px 14px;font-size:11px;border-radius:5px}
 .reviews-panel .reviews-summary{margin:0 0 12px;color:#999;font-size:11px}
 @media(max-width:600px){.reviews-accordion-trigger{padding:15px 13px;gap:10px}.reviews-accordion-title{font-size:17px}.reviews-accordion-subtitle{font-size:9px}.reviews-accordion-meta{gap:9px}.reviews-accordion-meta .reviews-average{font-size:16px}.reviews-chevron{width:25px;height:25px}.reviews-panel-actions{justify-content:stretch}.reviews-write-button{width:100%}}
+
+
+/* Member reviews — minimal Netflix-style accordion row */
+.reviews-section{border-top:1px solid rgba(255,255,255,.1);padding-top:24px}
+.reviews-heading{display:block!important;margin:0!important}
+.reviews-accordion-trigger{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:15px 2px;text-align:left;color:#f5f5f5;background:transparent;
+  border:0;border-bottom:1px solid rgba(255,255,255,.13);border-radius:0;
+  cursor:pointer;transition:border-color .18s ease,color .18s ease;
+}
+.reviews-accordion-trigger:hover{background:transparent;border-bottom-color:rgba(255,255,255,.38)}
+.reviews-accordion-trigger:focus-visible{outline:2px solid #e50914;outline-offset:4px}
+.reviews-accordion-copy{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.reviews-accordion-copy .section-kicker{margin:0;color:#e50914;font-size:9px;letter-spacing:1.8px}
+.reviews-accordion-title{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.reviews-accordion-subtitle{color:#929292;font-size:11px}
+.reviews-accordion-meta{display:flex;align-items:center;gap:15px;flex-shrink:0}
+.reviews-accordion-meta .reviews-average{font-size:18px;font-weight:750;color:#fff}
+.reviews-accordion-meta .reviews-average span{font-size:10px;color:#888;font-weight:500}
+.reviews-chevron{display:grid;place-items:center;width:auto;height:auto;border:0;border-radius:0;color:#aaa;font-size:22px;line-height:1;transition:transform .2s,color .2s}
+.reviews-accordion-trigger:hover .reviews-chevron{color:#fff}
+.reviews-accordion-trigger.is-open .reviews-chevron{transform:rotate(180deg);background:transparent;border:0;color:#e50914}
+.reviews-panel[hidden]{display:none!important}
+.reviews-panel{padding:16px 0 0;animation:reviewsPanelReveal .2s ease-out}
+@media(max-width:600px){
+ .reviews-accordion-trigger{padding:13px 0;gap:10px}
+ .reviews-accordion-title{font-size:17px}
+ .reviews-accordion-subtitle{font-size:9px}
+ .reviews-accordion-meta{gap:9px}
+ .reviews-accordion-meta .reviews-average{font-size:16px}
+ .reviews-chevron{font-size:20px}
+}
