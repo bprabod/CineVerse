@@ -24,7 +24,8 @@ jobs:
         run: node scripts/generate-hero-cache.mjs
       - name: Commit updated hero cache
         run: |
-          if git diff --quiet -- hero-cache.js; then
+          git add hero-cache.js
+          if git diff --cached --quiet -- hero-cache.js; then
             echo "Homepage hero cache is already up to date."
             exit 0
           fi
