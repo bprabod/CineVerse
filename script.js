@@ -143,7 +143,9 @@ async function showHeroSlide(index) {
   } catch (error) { console.warn('Featured slide image failed:', error); return; }
   if (transitionToken !== heroTransitionToken) return;
   const words = (movie.title || 'Featured movie').trim().split(/\s+/);
-  const isLongTitle = words.join(' ').length > 22;
+  const titleLength = words.join(' ').length;
+  const isLongTitle = titleLength > 20;
+  const titleFontSize = Math.max(30, Math.min(78, Math.round(2300 / titleLength)));
   let splitAt = words.length;
   if (isLongTitle && words.length > 2) {
     const midpoint = words.join(' ').length / 2;
@@ -161,6 +163,9 @@ async function showHeroSlide(index) {
   const heroContentElement = document.querySelector('.hero-content');
   heroImage?.classList.add('is-changing');
   heroContentElement?.classList.add('is-changing');
+  // Keep the outgoing slide faded long enough for the transition to be visible.
+  await new Promise(resolve => setTimeout(resolve, 520));
+  if (transitionToken !== heroTransitionToken) return;
   requestAnimationFrame(() => {
     if (transitionToken !== heroTransitionToken) return;
     const image = document.querySelector('.hero-image');
@@ -175,6 +180,8 @@ async function showHeroSlide(index) {
     if (kicker) kicker.textContent = 'NOW SHOWING ON CINEVERSE';
     if (title) {
       title.classList.toggle('is-long-title', isLongTitle);
+      if (isLongTitle) title.style.setProperty('--hero-title-size', `${titleFontSize}px`);
+      else title.style.removeProperty('--hero-title-size');
       title.innerHTML = `${escapeHtml(first)}${last ? `<br><span>${escapeHtml(last)}</span>` : ''}`;
     }
     if (description) description.textContent = movie.overview || 'Discover this featured movie on CineVerse.';
