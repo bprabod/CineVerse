@@ -855,25 +855,29 @@
 
 /* Responsive Adsterra Native Banner placement */
 .cv-native-ad{
-  width:min(100% - 12.4%, 1120px);
-  margin:30px auto 34px;
+  box-sizing:border-box;
+  width:min(300px, calc(100% - 24px));
+  margin:16px auto 20px;
   padding:0;
   color:rgba(255,255,255,.38);
-  font-size:9px;
+  font-size:8px;
   font-weight:700;
-  letter-spacing:1.5px;
-  text-align:left;
+  letter-spacing:1.2px;
+  text-align:center;
 }
 .cv-native-ad-label{
   display:block;
-  margin:0 0 9px 2px;
+  margin:0 0 5px;
 }
 #container-6e2d91a6ad04321640ed7203cf20f430{
   display:flex;
   align-items:center;
   justify-content:center;
-  width:100%;
+  width:300px;
+  max-width:100%;
   min-width:0;
+  min-height:0;
+  margin:0 auto;
   overflow:hidden;
 }
 #container-6e2d91a6ad04321640ed7203cf20f430 > *{
@@ -884,9 +888,6 @@
   max-width:100%;
   border:0;
 }
-@media(max-width:700px){
-  .cv-native-ad{
-    width:90%;
-    margin:24px auto 28px;
-  }
+.detail-page .cv-native-ad{
+  margin:10px auto 14px;
 }
