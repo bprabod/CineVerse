@@ -566,10 +566,16 @@
   scroll-snap-type:x mandatory;
 }
 .watchlist-grid::-webkit-scrollbar{display:none}
-.watchlist-grid .watchlist-card{min-width:0;position:relative}
-.watchlist-grid .watchlist-poster-link{display:block;position:relative;color:inherit;text-decoration:none}
+.watchlist-grid .watchlist-card{
+  min-width:0;
+  position:relative!important;
+  isolation:isolate;
+  overflow:hidden;
+}
+.watchlist-grid .watchlist-poster-link{display:block;position:relative;z-index:1;color:inherit;text-decoration:none}
 .watchlist-grid .watchlist-remove{
-  position:absolute!important;z-index:5!important;top:8px!important;right:8px!important;
+  position:absolute!important;z-index:20!important;top:8px!important;right:8px!important;
+  pointer-events:auto!important;
   width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;
   padding:0!important;margin:0!important;border:1px solid #ffffff70!important;border-radius:50%!important;
   background:rgba(10,10,10,.88)!important;color:#fff!important;
