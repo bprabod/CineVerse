@@ -94,7 +94,7 @@ $("authForm").addEventListener("submit", async e => {
   else $("authStatus").textContent="Account request received. Check your inbox for a confirmation email before signing in.";
  } catch(error) {
   $("authStatus").textContent = error.message || "Something went wrong. Please try again.";
-  if(authMode === "signin" && /invalid login credentials|invalid_credentials/i.test(`${error.message || ""} ${error.code || ""}`)){
+  if(authMode === "signin"){
    showForgotPassword = true;
    $("modePrompt").innerHTML = '<a class="forgot-password-action" href="#forgot" id="forgotToggle">Forgot password?</a><span class="auth-create-prompt">New to CineVerse? <a href="#create" id="modeToggle">Create account</a></span>';
   }
