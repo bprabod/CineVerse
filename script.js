@@ -300,13 +300,12 @@ async function syncDialogWatchButton() {
 
 async function recordDialogRecentWatch(movie) {
   try {
-    await window.cvAuthReady;
-    if (!movie) return;
+    if (window.cvAuthReady) await window.cvAuthReady;
     const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
     if (authError) throw authError;
-    if (!user) return;
-    const tmdbId = Number(movie.id);
-    if (!Number.isFinite(tmdbId) || tmdbId <= 0) throw new Error("Invalid TMDB title ID.");
+    if (!user) throw new Error("Please sign in before saving viewing history.");
+    const tmdbId = Number(movie?.id);
+    if (!Number.isSafeInteger(tmdbId) || tmdbId <= 0) throw new Error("Invalid TMDB title ID.");
     const { error } = await cvSupabase.from("watch_history").upsert({
       user_id: user.id,
       tmdb_id: tmdbId,
@@ -316,7 +315,13 @@ async function recordDialogRecentWatch(movie) {
       last_watched_at: new Date().toISOString()
     }, { onConflict: "user_id,tmdb_id,media_type" });
     if (error) throw error;
-  } catch (error) { console.error("Could not save recent watch:", error); }
+    showToast("Saved to Recently Watched.");
+    return true;
+  } catch (error) {
+    console.error("Could not save recent watch:", error);
+    showToast("Recently Watched save failed: " + (error.message || "Please sign in and try again."));
+    return false;
+  }
 }
 
 async function openMovie(id, type) {
@@ -358,7 +363,7 @@ dialog.addEventListener("click", event => { if (event.target === dialog) dialog.
 const streamPlayer = $("streamPlayer");
 const streamFrame = $("streamFrame");
 
-$("dialogPlay").addEventListener("click", () => {
+$("dialogPlay").addEventListener("click", async () => {
   if (!activeMovie) return;
   if (activeMovie.type !== "movie") {
     showToast("NexStream movie playback is currently set up for movies.");
@@ -367,7 +372,7 @@ $("dialogPlay").addEventListener("click", () => {
   const playerUrl = new URL(`${NEXSTREAM_EMBED}${encodeURIComponent(activeMovie.id)}`);
   playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
   streamFrame.src = playerUrl.toString();
-  void recordDialogRecentWatch(activeMovie);
+  await recordDialogRecentWatch(activeMovie);
   streamPlayer.hidden = false;
   streamPlayer.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
