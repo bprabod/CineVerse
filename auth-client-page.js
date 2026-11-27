@@ -3,25 +3,33 @@ let authMode = "signin";
 let showForgotPassword = false;
 const isPasswordReset = new URLSearchParams(location.search).get("mode") === "reset";
 
-const passwordInput = $("password");
-const passwordWrap = document.createElement("div");
-passwordWrap.className = "password-field";
-passwordInput.parentNode.insertBefore(passwordWrap, passwordInput);
-passwordWrap.appendChild(passwordInput);
-const passwordToggle = document.createElement("button");
-passwordToggle.type = "button";
-passwordToggle.className = "password-visibility-toggle";
-passwordToggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-passwordToggle.setAttribute("aria-label", "Show password");
-passwordToggle.setAttribute("aria-pressed", "false");
-passwordToggle.addEventListener("click", () => {
- const reveal = passwordInput.type === "password";
- passwordInput.type = reveal ? "text" : "password";
- passwordToggle.innerHTML = reveal ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a14 14 0 0 1-3 3.7"></path><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10.8 10.8 0 0 0 4-.8"></path></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
- passwordToggle.setAttribute("aria-label", reveal ? "Hide password" : "Show password");
- passwordToggle.setAttribute("aria-pressed", String(reveal));
+const passwordFields = ["password", "confirmPassword", "newPassword", "confirmNewPassword"];
+const passwordControls = {};
+const eyeIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+const eyeOffIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a14 14 0 0 1-3 3.7"></path><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10.8 10.8 0 0 0 4-.8"></path></svg>';
+passwordFields.forEach(id => {
+ const input = $(id);
+ if (!input) return;
+ const wrapper = document.createElement("div");
+ wrapper.className = "password-field";
+ input.parentNode.insertBefore(wrapper, input);
+ wrapper.appendChild(input);
+ const toggle = document.createElement("button");
+ toggle.type = "button";
+ toggle.className = "password-visibility-toggle";
+ toggle.innerHTML = eyeIcon;
+ toggle.setAttribute("aria-label", "Show password");
+ toggle.setAttribute("aria-pressed", "false");
+ toggle.addEventListener("click", () => {
+  const reveal = input.type === "password";
+  input.type = reveal ? "text" : "password";
+  toggle.innerHTML = reveal ? eyeOffIcon : eyeIcon;
+  toggle.setAttribute("aria-label", reveal ? "Hide password" : "Show password");
+  toggle.setAttribute("aria-pressed", String(reveal));
+ });
+ wrapper.appendChild(toggle);
+ passwordControls[id] = { input, wrapper };
 });
-passwordWrap.appendChild(passwordToggle);
 
 const setMode = mode => {
  authMode = mode;
@@ -41,7 +49,7 @@ const setMode = mode => {
  $("newPassword").required = reset;
  $("confirmNewPassword").hidden = !reset;
  $("confirmNewPassword").required = reset;
- passwordWrap.hidden = passwordInput.hidden;
+ passwordFields.forEach(id => { const control = passwordControls[id]; if (control) control.wrapper.hidden = control.input.hidden; });
  $("password").setAttribute("autocomplete", signup || reset ? "new-password" : "current-password");
  $("modePrompt").innerHTML = reset || forgot
   ? 'Remembered your password? <a href="#signin" id="modeToggle">Sign in</a>'
