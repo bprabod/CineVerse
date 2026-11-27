@@ -11,13 +11,13 @@ passwordWrap.appendChild(passwordInput);
 const passwordToggle = document.createElement("button");
 passwordToggle.type = "button";
 passwordToggle.className = "password-visibility-toggle";
-passwordToggle.textContent = "Show";
+passwordToggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
 passwordToggle.setAttribute("aria-label", "Show password");
 passwordToggle.setAttribute("aria-pressed", "false");
 passwordToggle.addEventListener("click", () => {
  const reveal = passwordInput.type === "password";
  passwordInput.type = reveal ? "text" : "password";
- passwordToggle.textContent = reveal ? "Hide" : "Show";
+ passwordToggle.innerHTML = reveal ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a14 14 0 0 1-3 3.7"></path><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10.8 10.8 0 0 0 4-.8"></path></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
  passwordToggle.setAttribute("aria-label", reveal ? "Hide password" : "Show password");
  passwordToggle.setAttribute("aria-pressed", String(reveal));
 });
