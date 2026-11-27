@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090909">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin Dashboard | CineVerse</title>
+  <link rel="icon" href="favicon.svg?v=6">
+  <link rel="stylesheet" href="style.css?v=admin-panel-1">
+  <style>
+    .admin-page{min-height:100vh;background:#080808;background-image:radial-gradient(ellipse at 50% 0%,rgba(130,10,20,.2),transparent 44%)}
+    .admin-header{position:relative;background:rgba(5,5,5,.94);border-bottom:1px solid rgba(255,255,255,.09);backdrop-filter:blur(14px)}
+    .admin-main{width:min(100% - 44px,1100px);margin:0 auto;padding:54px 0 90px}
+    .admin-kicker{margin:0 0 10px;color:#e50914;font-size:10px;font-weight:800;letter-spacing:2.5px}
+    .admin-title{margin:0;font-size:clamp(34px,5vw,48px);letter-spacing:-2px}
+    .admin-subtitle{margin:10px 0 32px;color:#999;font-size:13px}
+    .admin-status{padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:#151515;color:#bbb;font-size:13px}
+    .admin-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0 38px}
+    .admin-stat{padding:23px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:linear-gradient(145deg,#1c1c1c,#101010)}
+    .admin-stat-label{color:#999;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+    .admin-stat-value{display:block;margin-top:12px;font-size:34px;font-weight:800;letter-spacing:-1px}
+    .admin-section{margin-top:32px}
+    .admin-section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:15px}
+    .admin-section-head h2{margin:0;font-size:22px;letter-spacing:-.5px}
+    .admin-section-head span{color:#777;font-size:10px;letter-spacing:1px}
+    .admin-review-list{display:grid;gap:10px}
+    .admin-review{display:flex;justify-content:space-between;gap:18px;padding:16px;border:1px solid rgba(255,255,255,.09);border-radius:8px;background:rgba(255,255,255,.025)}
+    .admin-review-main{min-width:0}
+    .admin-review-title{font-size:13px;font-weight:750}
+    .admin-review-meta{display:block;margin-top:5px;color:#888;font-size:10px}
+    .admin-review-text{margin:9px 0 0;color:#bbb;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+    .admin-review-rating{flex-shrink:0;color:#f5bd42;font-size:12px;white-space:nowrap}
+    .admin-back{display:inline-flex;margin-top:28px;color:#aaa;font-size:12px}
+    .admin-back:hover{color:#fff}
+    @media(max-width:650px){.admin-main{width:min(100% - 30px,1100px);padding-top:38px}.admin-stats{grid-template-columns:1fr;gap:10px}.admin-stat{padding:17px}.admin-stat-value{font-size:28px}.admin-review{padding:13px;gap:10px}.admin-section-head h2{font-size:19px}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="auth-client.js?v=2"></script>
+  <script defer src="admin.js?v=admin-panel-1"></script>
+</head>
+<body class="detail-page admin-page">
+  <header class="site-header admin-header">
+    <a class="brand" href="index.html">CINE<span>VERSE</span></a>
+    <div class="header-actions">
+      <a class="button button-secondary" href="account.html">My Account</a>
+      <button class="button button-secondary" id="adminSignOut" type="button">Sign out</button>
+    </div>
+  </header>
+  <main class="admin-main">
+    <p class="admin-kicker">CINEVERSE CONTROL CENTER</p>
+    <h1 class="admin-title">Admin Dashboard</h1>
+    <p class="admin-subtitle">A private overview of your CineVerse community.</p>
+    <p class="admin-status" id="adminStatus" role="status" aria-live="polite">Verifying administrator access…</p>
+    <section class="admin-stats" id="adminStats" hidden aria-label="Website statistics">
+      <article class="admin-stat"><span class="admin-stat-label">Registered members</span><strong class="admin-stat-value" id="memberCount">—</strong></article>
+      <article class="admin-stat"><span class="admin-stat-label">Community reviews</span><strong class="admin-stat-value" id="reviewCount">—</strong></article>
+      <article class="admin-stat"><span class="admin-stat-label">Admin access</span><strong class="admin-stat-value" style="font-size:23px;color:#7ed6a0">Active</strong></article>
+    </section>
+    <section class="admin-section" id="recentReviewsSection" hidden>
+      <div class="admin-section-head"><h2>Latest community reviews</h2><span>RECENT ACTIVITY</span></div>
+      <div class="admin-review-list" id="adminReviewList"></div>
+    </section>
+    <a class="admin-back" href="account.html">← Back to account</a>
+  </main>
+</body>
+</html>
