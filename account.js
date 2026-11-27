@@ -115,11 +115,15 @@ function escapeHistoryHtml(value) {
     usernameEl.textContent = username || "CineVerse member";
     emailEl.textContent = user.email || "Email unavailable";
     statusEl.textContent = "Your account is active.";
+    let isAdmin = false;
+    let adminCheckSucceeded = false;
     try {
       const { data: adminGrant, error: adminGrantError } = await cvSupabase
         .from("cineverse_admins").select("user_id").eq("user_id", user.id).maybeSingle();
       if (adminGrantError) throw adminGrantError;
-      if (adminGrant) {
+      adminCheckSucceeded = true;
+      isAdmin = !!adminGrant;
+      if (isAdmin) {
         const headerActions = document.querySelector(".account-page .header-actions");
         if (headerActions && !document.getElementById("adminPanelLink")) {
           const adminLink = document.createElement("a");
@@ -135,7 +139,13 @@ function escapeHistoryHtml(value) {
     }
     await loadRecentHistory(user.id);
     await loadProfileReviews(user.id);
-    await loadSupportThreads(user.id);
+    if (adminCheckSucceeded && !isAdmin) {
+      const supportSection = document.querySelector(".account-page .support-section");
+      const supportQuickLink = document.querySelector(".account-page .support-quick-link");
+      if (supportSection) supportSection.hidden = false;
+      if (supportQuickLink) supportQuickLink.hidden = false;
+      await loadSupportThreads(user.id);
+    }
   } catch (error) {
     console.warn("CineVerse account session check failed:", error);
     statusEl.textContent = "We couldn't verify your session. Please refresh the page or sign in again.";
