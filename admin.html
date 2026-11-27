@@ -49,13 +49,34 @@
     .admin-delete-review{padding:8px 11px;border:1px solid rgba(229,9,20,.35);border-radius:5px;background:rgba(229,9,20,.1);color:#ff858a;font-size:10px;cursor:pointer}
     .admin-delete-review:hover{background:rgba(229,9,20,.2)}
     .admin-empty{padding:14px 0;color:#888;font-size:12px}
+
+    .admin-inbox-panel{margin-top:24px;padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.025)}
+    .admin-inbox-grid{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.5fr);gap:18px}
+    .admin-inbox-list{display:grid;align-content:start;gap:7px;max-height:520px;overflow:auto}
+    .admin-inbox-thread{width:100%;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:#111;color:#eee;text-align:left;cursor:pointer}
+    .admin-inbox-thread.is-active{border-color:rgba(229,9,20,.65);background:rgba(229,9,20,.08)}
+    .admin-inbox-thread strong{display:block;font-size:12px}
+    .admin-inbox-thread small{display:block;margin-top:5px;color:#888;font-size:9px}
+    .admin-inbox-thread p{margin:7px 0 0;color:#aaa;font-size:10px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .admin-inbox-conversation{min-width:0;padding:14px;border:1px solid rgba(255,255,255,.09);border-radius:7px;background:#0c0c0c}
+    .admin-inbox-conversation[hidden]{display:none!important}
+    .admin-inbox-messages{max-height:390px;overflow:auto}
+    .admin-inbox-message{max-width:88%;margin:8px 0;padding:10px 12px;border-radius:8px;background:#202020;color:#ddd;font-size:12px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+    .admin-inbox-message.is-admin{margin-left:auto;background:#4b1116}
+    .admin-inbox-message small{display:block;margin-top:5px;color:#aaa;font-size:9px}
+    .admin-inbox-reply{display:grid;gap:9px;margin-top:14px}
+    .admin-inbox-reply[hidden]{display:none!important}
+    .admin-inbox-reply textarea{box-sizing:border-box;width:100%;min-height:75px;padding:11px;border:1px solid #393939;border-radius:6px;background:#080808;color:#fff;font:12px/1.6 "DM Sans",Arial,sans-serif}
+    .admin-inbox-actions{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .admin-inbox-status{min-height:16px;margin:8px 0 0;color:#eaa0a4;font-size:10px}
+    @media(max-width:800px){.admin-inbox-grid{grid-template-columns:1fr}.admin-inbox-list{max-height:260px}.admin-inbox-panel{padding:16px}}
     .admin-back{display:inline-flex;margin-top:28px;color:#aaa;font-size:12px}
     .admin-back:hover{color:#fff}
     @media(max-width:800px){.admin-tools{grid-template-columns:1fr}.admin-panel{padding:17px}}\n    @media(max-width:650px){.admin-main{width:min(100% - 30px,1100px);padding-top:38px}.admin-stats{grid-template-columns:1fr;gap:10px}.admin-stat{padding:17px}.admin-stat-value{font-size:28px}.admin-review{padding:13px;gap:10px}.admin-section-head h2{font-size:19px}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js?v=2"></script>
-  <script defer src="admin.js?v=admin-tools-4"></script>
+  <script defer src="admin.js?v=contact-admin-1"></script>
 </head>
 <body class="detail-page admin-page admin-locked">
   <header class="site-header admin-header">
@@ -86,6 +107,22 @@
         <div class="admin-review-list" id="adminReviewList" aria-live="polite"><p class="admin-empty">Loading reviews…</p></div>
       </section>
     </div>
+
+    <section class="admin-inbox-panel" id="adminInboxPanel" hidden aria-labelledby="adminInboxTitle">
+      <div class="admin-panel-head"><div><p class="admin-kicker">MEMBER SUPPORT</p><h2 id="adminInboxTitle">Contact Admin Inbox</h2></div><span class="admin-panel-note" id="adminInboxCount">MESSAGES</span></div>
+      <div class="admin-inbox-grid">
+        <div class="admin-inbox-list" id="adminInboxList"><p class="admin-empty">Loading conversations…</p></div>
+        <div class="admin-inbox-conversation" id="adminInboxConversation" hidden>
+          <div class="admin-inbox-messages" id="adminInboxMessages"></div>
+          <div class="admin-inbox-actions"><span class="admin-panel-note" id="adminInboxThreadStatus"></span><button class="button button-secondary" id="adminToggleThreadStatus" type="button">Close conversation</button></div>
+          <form class="admin-inbox-reply" id="adminInboxReplyForm">
+            <textarea id="adminInboxReplyText" maxlength="2000" placeholder="Reply to this member…" required></textarea>
+            <button class="button button-primary" id="adminInboxReplyButton" type="submit">Send Reply</button>
+          </form>
+        </div>
+      </div>
+      <p class="admin-inbox-status" id="adminInboxStatus" role="status" aria-live="polite"></p>
+    </section>
     <a class="admin-back" href="account.html">← Back to account</a>
   </main>
 </body>
