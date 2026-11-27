@@ -129,14 +129,21 @@ async function loadDatabaseHero() {
       Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
       Accept: "application/json"
     };
+    // Prefer the build-time snapshot so every visitor gets the featured movie immediately.
+    // Fall back to Supabase if the snapshot is absent.
+    const cachedFeatured = window.CV_HERO_CACHE || null;
     const [backgroundResponse, contentResponse] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/homepage_background?select=title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`, { headers }),
+      cachedFeatured ? Promise.resolve(null) :
+        fetch(`${SUPABASE_URL}/rest/v1/homepage_background?select=title,backdrop_path,overview,release_date,vote_average,updated_at&id=eq.1`, { headers }),
       fetch(`${SUPABASE_URL}/rest/v1/homepage_content?select=cta_label,cta_href,side_note,side_count&id=eq.1`, { headers })
     ]);
 
-    if (!backgroundResponse.ok) throw new Error("Could not load featured movie data.");
-    const backgroundRows = await backgroundResponse.json();
-    const featured = backgroundRows[0];
+    let featured = cachedFeatured;
+    if (!featured) {
+      if (!backgroundResponse?.ok) throw new Error("Could not load featured movie data.");
+      const backgroundRows = await backgroundResponse.json();
+      featured = backgroundRows[0];
+    }
     if (!featured || !featured.backdrop_path) return;
 
     let content = null;
