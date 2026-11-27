@@ -569,12 +569,20 @@
 .watchlist-grid .watchlist-card{min-width:0;position:relative}
 .watchlist-grid .watchlist-poster-link{display:block;position:relative;color:inherit;text-decoration:none}
 .watchlist-grid .watchlist-remove{
-  position:absolute;z-index:4;top:9px;right:9px;
-  width:29px;height:29px;padding:0;border:1px solid #ffffff55;border-radius:50%;
-  background:#111d;color:#fff;font-size:21px;line-height:1;cursor:pointer;
-  display:grid;place-items:center;transition:background .2s,transform .2s;
+  position:absolute!important;z-index:5!important;top:8px!important;right:8px!important;
+  width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;
+  padding:0!important;margin:0!important;border:1px solid #ffffff70!important;border-radius:50%!important;
+  background:rgba(10,10,10,.88)!important;color:#fff!important;
+  font-size:0!important;line-height:1!important;font-weight:400!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  cursor:pointer!important;box-shadow:0 2px 10px #0009!important;
+  transition:background .2s,transform .2s!important;
 }
-.watchlist-grid .watchlist-remove:hover:not(:disabled){background:var(--red);transform:scale(1.08)}
+.watchlist-grid .watchlist-remove::before{
+  content:"×";display:block;font-family:Arial,sans-serif;font-size:25px;font-weight:300;
+  line-height:1;transform:translateY(-1px);
+}
+.watchlist-grid .watchlist-remove:hover:not(:disabled){background:var(--red)!important;transform:scale(1.08)}
 .watchlist-grid .watchlist-remove:disabled{opacity:.65;cursor:wait}
 @media(max-width:600px){
   .watchlist-grid{grid-auto-columns:clamp(145px,42vw,190px);gap:11px}
