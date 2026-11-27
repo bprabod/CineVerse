@@ -126,7 +126,7 @@ $("authForm").addEventListener("submit", async e => {
   if(data.session){$("authStatus").textContent="Account created. Opening your account…";location.href="account.html";}
   else $("authStatus").textContent="Account request received. Check your inbox for a confirmation email before signing in.";
  } catch(error) {
-  $("authStatus").textContent = error.message || "Something went wrong. Please try again.";
+  $("authStatus").textContent = /session missing/i.test(error.message || "") ? "Please sign in to continue." : (error.message || "Something went wrong. Please try again.");
   if(authMode === "signin"){
    showForgotPassword = true;
    $("modePrompt").innerHTML = '<a class="forgot-password-action" href="#forgot" id="forgotToggle">Forgot password?</a><span class="auth-create-prompt">New to CineVerse? <a href="#create" id="modeToggle">Create account</a></span>';
