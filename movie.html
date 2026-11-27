@@ -15,6 +15,7 @@
   <script defer src="seo.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js"></script>
+  <script defer src="account-link.js"></script>
   <script defer src="movie.js"></script>
   <script data-cfasync="false" src="https://aarems.org/1/e8d627e5da08d89fdb8faad6dbb81621"></script>
 </head>
@@ -26,7 +27,7 @@
     </nav>
     <div class="header-actions">
       <a class="icon-button" href="index.html#searchSection" aria-label="Search movies"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></a>
-      <a class="profile-button" href="index.html#top" aria-label="CineVerse home">CV</a>
+      <a class="profile-button" id="accountLink" href="auth.html" aria-label="Sign in to CineVerse" title="Sign in">CV</a>
     </div>
   </header>
   <main class="detail-main">
