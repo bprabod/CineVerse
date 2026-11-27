@@ -142,5 +142,5 @@ $("authForm").addEventListener("submit", async e => {
   $("authSubmit").disabled = false;
  }
 });
-if (isPasswordReset) setMode("reset");
+setMode(isPasswordReset ? "reset" : "signin");
 cvSupabase.auth.onAuthStateChange((event) => { if (event === "PASSWORD_RECOVERY") setMode("reset"); });
