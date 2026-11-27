@@ -10,11 +10,15 @@ const eyeOffIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18
 passwordFields.forEach(id => {
  const input = $(id);
  if (!input) return;
- const wrapper = document.createElement("div");
- wrapper.className = "password-field";
- wrapper.style.cssText = "position:relative!important;width:100%!important;display:block!important;";
- input.parentNode.insertBefore(wrapper, input);
- wrapper.appendChild(input);
+ let wrapper = input.closest(".password-field");
+ if (!wrapper) {
+  wrapper = document.createElement("div");
+  wrapper.className = "password-field";
+  wrapper.style.cssText = "position:relative!important;width:100%!important;display:block!important;";
+  input.parentNode.insertBefore(wrapper, input);
+  wrapper.appendChild(input);
+ }
+ wrapper.querySelectorAll(".password-visibility-toggle").forEach(button => button.remove());
  input.style.setProperty("width", "100%", "important");
  input.style.setProperty("box-sizing", "border-box", "important");
  input.style.setProperty("padding-right", "54px", "important");
