@@ -223,18 +223,16 @@ $("stopButton").addEventListener("click", () => {
   $("playerSection").hidden = true;
 });
 
-$("listButton").addEventListener("click", () => {
+$("listButton").addEventListener("click", async () => {
   if (!currentTitle) return;
-  const key = "cineverse-watchlist";
-  const saved = JSON.parse(localStorage.getItem(key) || "[]");
-  const title = currentTitle.title || currentTitle.name || "Untitled";
-  if (!saved.some(item => String(item.id) === String(id) && item.type === type)) {
-    saved.push({ id: Number(id), type, title, image: currentTitle.poster_path ? `${IMAGE_BASE}w500${currentTitle.poster_path}` : posterFallback });
-    localStorage.setItem(key, JSON.stringify(saved));
-    $("detailStatus").textContent = `${title} added to your list.`;
-  } else {
-    $("detailStatus").textContent = "This title is already in your list.";
-  }
+  const {data:{user},error:authError}=await cvSupabase.auth.getUser();
+  if(authError||!user){location.href="auth.html";return;}
+  const title=currentTitle.title||currentTitle.name||"Untitled";
+  const poster=currentTitle.poster_path? `${IMAGE_BASE}w500${currentTitle.poster_path}`:posterFallback;
+  const {error}=await cvSupabase.from("watchlist").insert({user_id:user.id,tmdb_id:Number(id),media_type:type,title,poster_url:poster});
+  if(error && error.code==="23505") $("detailStatus").textContent="This title is already in your list.";
+  else if(error) $("detailStatus").textContent="Could not save title: "+error.message;
+  else $("detailStatus").textContent=title+" added to your list.";
 });
 
 window.addEventListener("pagehide", () => { $("playerFrame").src = "about:blank"; });
