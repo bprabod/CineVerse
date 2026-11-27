@@ -80,7 +80,13 @@ async function loadAdminDashboard(user) {
   adminTools.hidden = false;
   await Promise.all([loadMembers(), loadReviews()]);
   document.getElementById("streamingKeyPanel").hidden = false;
-  await loadStreamingKeyConfig();
+  try {
+    await loadStreamingKeyConfig();
+  } catch (streamingError) {
+    document.getElementById("streamingKeyState").textContent = "UNAVAILABLE";
+    document.getElementById("streamingKeyCountdown").textContent = "Could not load";
+    document.getElementById("streamingKeyStatus").textContent = streamingError.message || "Could not load streaming settings.";
+  }
   document.getElementById("adminInboxPanel").hidden = false;
   try {
     await loadSupportInbox();
