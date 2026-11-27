@@ -277,15 +277,15 @@ $("toggleReviews").addEventListener("click", () => {
 });
 
 $("writeReviewButton").addEventListener("click", () => {
-  const form = $("reviewForm");
-  if (form.hidden) {
-    form.hidden = false;
-    $("reviewGuestPrompt").hidden = true;
-    form.scrollIntoView({behavior:"smooth",block:"center"});
-  } else {
-    form.scrollIntoView({behavior:"smooth",block:"center"});
-    $("reviewText").focus();
+  if (!reviewUser) {
+    $("reviewGuestPrompt").hidden = false;
+    $("reviewGuestPrompt").scrollIntoView({behavior:"smooth",block:"center"});
+    return;
   }
+  const form = $("reviewForm");
+  form.hidden = false;
+  form.scrollIntoView({behavior:"smooth",block:"center"});
+  $("reviewText").focus();
 });
 
 $("reviewRatingPicker").addEventListener("click", event => {
