@@ -86,7 +86,7 @@ function movieCard(movie) {
       loading="lazy" onerror="this.src='${FALLBACK_POSTER}'">
     <div class="card-gradient"></div>
     <span class="card-top">${movie.type === "tv" ? "SERIES" : "TMDB"}</span>
-    ${movie.releaseDate ? '<span class="release-countdown-badge" data-release-countdown="' + escapeHtml(movie.releaseDate) + '"></span>' : ''}
+    ${formatReleaseCountdown(movie.releaseDate) ? '<span class="release-countdown-badge" data-release-countdown="' + escapeHtml(movie.releaseDate) + '>' + escapeHtml(formatReleaseCountdown(movie.releaseDate)) + '</span>' : ''}
     <div class="card-info"><h3>${escapeHtml(movie.title)}</h3>
       <p>${escapeHtml(movie.year)} &nbsp;·&nbsp; ★ ${escapeHtml(movie.rating)}</p></div>
   </a>`;
