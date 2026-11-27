@@ -18,12 +18,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=6">
-  <link rel="stylesheet" href="style.css?v=reviews-1">
+  <link rel="stylesheet" href="style.css?v=reviews-netflix-2">
   <script defer src="seo.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js?v=2"></script>
   <script defer src="account-link.js?v=4"></script>
-  <script defer src="movie.js?v=reviews-1"></script>
+  <script defer src="movie.js?v=reviews-netflix-2"></script>
   <script defer src="native-ads.js?v=mobile-ad-layout-1"></script>
 </head>
 <body class="detail-page">
@@ -82,12 +82,13 @@
     </section>
 
     <section class="detail-extra reviews-section" id="reviewsSection" aria-labelledby="reviewsHeading">
-      <div class="detail-section-heading reviews-heading">
-        <div><p class="section-kicker">CINEVERSE COMMUNITY</p><h2 id="reviewsHeading">Member reviews</h2></div>
-        <div class="reviews-heading-actions"><div class="reviews-average" id="reviewsAverage" aria-live="polite">— <span> / 5</span></div><button type="button" class="reviews-toggle-button" id="toggleReviews" aria-expanded="false" aria-controls="reviewsPanel">Add a review</button></div>
-      </div>
+      <button class="reviews-accordion-trigger" id="toggleReviews" type="button" aria-expanded="false" aria-controls="reviewsPanel">
+        <span class="reviews-accordion-copy"><span class="section-kicker">CINEVERSE COMMUNITY</span><span class="reviews-accordion-title" id="reviewsHeading">Member reviews</span><span class="reviews-accordion-subtitle">Ratings and thoughts from the community</span></span>
+        <span class="reviews-accordion-meta"><span class="reviews-average" id="reviewsAverage" aria-live="polite">— <span>/ 5</span></span><span class="reviews-chevron" aria-hidden="true">⌄</span></span>
+      </button>
       <div class="reviews-panel" id="reviewsPanel" hidden>
       <p class="reviews-summary" id="reviewsSummary">Loading member reviews…</p>
+      <div class="reviews-panel-actions"><button type="button" class="button button-primary reviews-write-button" id="writeReviewButton">＋ Add a review</button></div>
       <div class="review-compose" id="reviewCompose">
         <div class="review-guest-prompt" id="reviewGuestPrompt" hidden>
           <p>Sign in to share your review of this title.</p>
