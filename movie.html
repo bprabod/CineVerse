@@ -18,12 +18,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=6">
-  <link rel="stylesheet" href="style.css?v=mobile-ad-layout-1">
+  <link rel="stylesheet" href="style.css?v=reviews-1">
   <script defer src="seo.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js?v=2"></script>
   <script defer src="account-link.js?v=4"></script>
-  <script defer src="movie.js?v=recent-history-3"></script>
+  <script defer src="movie.js?v=reviews-1"></script>
   <script defer src="native-ads.js?v=mobile-ad-layout-1"></script>
 </head>
 <body class="detail-page">
@@ -79,6 +79,39 @@
     <section class="detail-extra" id="trailerSection" hidden>
       <div class="detail-section-heading"><p class="section-kicker">WATCH THE PREVIEW</p><h2>Trailer</h2></div>
       <a class="button button-secondary" id="trailerLink" href="#" target="_blank" rel="noopener noreferrer">▶ Watch trailer on YouTube</a>
+    </section>
+
+    <section class="detail-extra reviews-section" id="reviewsSection" aria-labelledby="reviewsHeading">
+      <div class="detail-section-heading reviews-heading">
+        <div><p class="section-kicker">CINEVERSE COMMUNITY</p><h2 id="reviewsHeading">Member reviews</h2></div>
+        <div class="reviews-average" id="reviewsAverage" aria-live="polite">— <span> / 5</span></div>
+      </div>
+      <p class="reviews-summary" id="reviewsSummary">Loading member reviews…</p>
+      <div class="review-compose" id="reviewCompose">
+        <div class="review-guest-prompt" id="reviewGuestPrompt" hidden>
+          <p>Sign in to share your review of this title.</p>
+          <a class="button button-primary" href="auth.html">Sign in</a>
+        </div>
+        <form id="reviewForm" hidden>
+          <h3 id="reviewFormHeading">Write your review</h3>
+          <label class="review-rating-label">Your rating</label>
+          <div class="review-rating-picker" id="reviewRatingPicker" role="group" aria-label="Choose a rating from 1 to 5">
+            <button type="button" data-rating="1" aria-label="1 star">★</button>
+            <button type="button" data-rating="2" aria-label="2 stars">★</button>
+            <button type="button" data-rating="3" aria-label="3 stars">★</button>
+            <button type="button" data-rating="4" aria-label="4 stars">★</button>
+            <button type="button" data-rating="5" aria-label="5 stars">★</button>
+          </div>
+          <label class="review-rating-label" for="reviewText">Your review</label>
+          <textarea id="reviewText" maxlength="1000" minlength="5" rows="4" placeholder="What did you think about this title? (5–1000 characters)" required></textarea>
+          <div class="review-form-footer">
+            <span id="reviewCharCount">0 / 1000</span>
+            <div><button class="button button-secondary" id="cancelReviewEdit" type="button" hidden>Cancel</button><button class="button button-primary" id="submitReview" type="submit">Post review</button></div>
+          </div>
+          <p class="review-status" id="reviewStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="reviews-list" id="reviewsList" aria-live="polite"><p class="detail-muted">Loading reviews…</p></div>
     </section>
     <section class="detail-player" id="playerSection" hidden>
       <div class="player-heading"><h2 id="playerHeading">Now playing</h2><div class="player-controls"><button class="text-button" id="fullscreenButton" type="button">⛶ Fullscreen</button><button class="text-button" id="stopButton" type="button">Stop player</button></div></div>
