@@ -127,20 +127,25 @@ function renderExtraDetails(item) {
 
 async function recordRecentWatch(item, mediaType, titleText) {
   try {
-    const { data: { user } } = await cvSupabase.auth.getUser();
-    if (!user || !item) return;
+    await window.cvAuthReady;
+    if (!item) return;
+    const { data: { user }, error: authError } = await cvSupabase.auth.getUser();
+    if (authError) throw authError;
+    if (!user) return;
+    const tmdbId = Number(item.id || id);
+    if (!Number.isFinite(tmdbId) || tmdbId <= 0) throw new Error("Invalid TMDB title ID.");
     const poster = item.poster_path ? `${IMAGE_BASE}w342${item.poster_path}` : posterFallback;
     const { error } = await cvSupabase.from("watch_history").upsert({
       user_id: user.id,
-      tmdb_id: Number(id),
+      tmdb_id: tmdbId,
       media_type: mediaType || type,
       title: titleText || item.title || item.name || "Untitled",
       poster_url: poster,
       last_watched_at: new Date().toISOString()
     }, { onConflict: "user_id,tmdb_id,media_type" });
-    if (error) console.warn("Could not save recent watch:", error);
+    if (error) throw error;
   } catch (error) {
-    console.warn("Could not save recent watch:", error);
+    console.error("Could not save recent watch:", error);
   }
 }
 
@@ -258,7 +263,7 @@ $("playButton").addEventListener("click", () => {
   const playerUrl = new URL(`${NEXSTREAM_MOVIE_EMBED}${encodeURIComponent(id)}`);
   playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
   $("playerFrame").src = playerUrl.toString();
-  recordRecentWatch(currentTitle, type);
+  void recordRecentWatch(currentTitle, type);
   $("playerHeading").textContent = `Now playing · ${currentTitle.title || currentTitle.name || "Movie"}`;
   $("playerSection").hidden = false;
   $("playerSection").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -273,7 +278,7 @@ $("playEpisodeButton").addEventListener("click", () => {
   const playerUrl = new URL(`${NEXSTREAM_TV_EMBED}${encodeURIComponent(id)}/${selectedSeason}/${episodeNumber}`);
   playerUrl.searchParams.set("apikey", NEXSTREAM_API_KEY);
   $("playerFrame").src = playerUrl.toString();
-  recordRecentWatch(currentTitle, type, `${currentTitle.name || currentTitle.title || "Series"} · S${selectedSeason} E${episodeNumber}`);
+  void recordRecentWatch(currentTitle, type, `${currentTitle.name || currentTitle.title || "Series"} · S${selectedSeason} E${episodeNumber}`);
   $("playerHeading").textContent = `Now playing · S${String(selectedSeason).padStart(2, "0")} E${String(episodeNumber).padStart(2, "0")} — ${episode.name || "Episode"}`;
   $("playerSection").hidden = false;
   $("playerSection").scrollIntoView({ behavior: "smooth", block: "start" });
