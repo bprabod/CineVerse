@@ -79,6 +79,8 @@ async function loadAdminDashboard(user) {
   adminStats.hidden = false;
   adminTools.hidden = false;
   await Promise.all([loadMembers(), loadReviews()]);
+  document.getElementById("streamingKeyPanel").hidden = false;
+  await loadStreamingKeyConfig();
   document.getElementById("adminInboxPanel").hidden = false;
   try {
     await loadSupportInbox();
@@ -281,4 +283,99 @@ document.getElementById("adminToggleThreadStatus")?.addEventListener("click", as
   } catch (error) {
     document.getElementById("adminInboxStatus").textContent = error.message || "Could not update conversation.";
   } finally { button.disabled = false; }
+});
+
+
+/* Admin-only UI for the current Nexstream key and its 30-day validity window. */
+let currentStreamingConfig = null;
+let streamingCountdownTimer = null;
+
+function toLocalDateTimeValue(date) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function formatStreamingDate(value) {
+  if (!value) return "Not set";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not set";
+  return date.toLocaleString(undefined, { day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+
+function refreshStreamingKeyCountdown() {
+  const countdown = document.getElementById("streamingKeyCountdown");
+  const dates = document.getElementById("streamingKeyDates");
+  const state = document.getElementById("streamingKeyState");
+  if (!countdown || !dates || !state) return;
+  const activatedAt = currentStreamingConfig?.activated_at;
+  if (!activatedAt) {
+    countdown.textContent = "Set activation date";
+    countdown.className = "";
+    dates.textContent = "Key is saved, but the 30-day countdown has not started.";
+    state.textContent = currentStreamingConfig?.api_key ? "KEY CONFIGURED" : "NO KEY";
+    return;
+  }
+  const start = new Date(activatedAt);
+  const expiry = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const remaining = expiry.getTime() - Date.now();
+  dates.textContent = "Activated: " + formatStreamingDate(start) + " · Expires: " + formatStreamingDate(expiry);
+  if (remaining <= 0) {
+    countdown.textContent = "EXPIRED";
+    countdown.className = "is-expired";
+    state.textContent = "RENEWAL REQUIRED";
+    return;
+  }
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  countdown.textContent = days + "d " + String(hours).padStart(2,"0") + "h " +
+    String(minutes).padStart(2,"0") + "m " + String(seconds).padStart(2,"0") + "s";
+  countdown.className = remaining <= 3 * 86400000 ? "is-warning" : "";
+  state.textContent = remaining <= 3 * 86400000 ? "EXPIRY SOON" : "ACTIVE";
+}
+
+async function loadStreamingKeyConfig() {
+  const status = document.getElementById("streamingKeyStatus");
+  const { data, error } = await cvSupabase.from("cineverse_streaming_config")
+    .select("id,api_key,activated_at,updated_at").eq("id", 1).maybeSingle();
+  if (error) throw error;
+  currentStreamingConfig = data || null;
+  document.getElementById("streamingApiKey").value = "";
+  document.getElementById("streamingActivatedAt").value = data?.activated_at
+    ? toLocalDateTimeValue(new Date(data.activated_at))
+    : toLocalDateTimeValue(new Date());
+  status.textContent = data?.api_key ? "A streaming key is configured. The key itself stays masked." : "No streaming key has been saved yet.";
+  refreshStreamingKeyCountdown();
+  if (streamingCountdownTimer) clearInterval(streamingCountdownTimer);
+  streamingCountdownTimer = setInterval(refreshStreamingKeyCountdown, 1000);
+}
+
+document.getElementById("saveStreamingKey")?.addEventListener("click", async () => {
+  const keyInput = document.getElementById("streamingApiKey");
+  const dateInput = document.getElementById("streamingActivatedAt");
+  const button = document.getElementById("saveStreamingKey");
+  const status = document.getElementById("streamingKeyStatus");
+  const apiKey = keyInput.value.trim() || currentStreamingConfig?.api_key;
+  const activationDate = dateInput.value ? new Date(dateInput.value) : null;
+  if (!apiKey) { status.textContent = "Please enter the API key."; keyInput.focus(); return; }
+  if (!activationDate || Number.isNaN(activationDate.getTime())) {
+    status.textContent = "Please choose the activation date and time."; dateInput.focus(); return;
+  }
+  button.disabled = true;
+  button.textContent = "Saving…";
+  try {
+    const payload = { id:1, api_key:apiKey, activated_at:activationDate.toISOString(), updated_at:new Date().toISOString() };
+    const { error } = await cvSupabase.from("cineverse_streaming_config").upsert(payload, { onConflict:"id" });
+    if (error) throw error;
+    currentStreamingConfig = payload;
+    keyInput.value = "";
+    status.textContent = "Saved successfully. The 30-day countdown has started.";
+    refreshStreamingKeyCountdown();
+  } catch (error) {
+    status.textContent = error.message || "Could not save the streaming key.";
+  } finally {
+    button.disabled = false;
+    button.textContent = "Save API Key";
+  }
 });
