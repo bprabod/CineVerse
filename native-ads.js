@@ -27,7 +27,13 @@
       main.insertAdjacentElement("beforebegin", slot);
     } else {
       const hero = main.querySelector(".hero");
-      if (hero) hero.insertAdjacentElement("afterend", slot);
+      if (hero && window.matchMedia("(max-width: 600px)").matches) {
+        // On phones, place the banner before the tall hero so it is not pushed far down.
+        slot.style.marginTop = "72px";
+        hero.insertAdjacentElement("beforebegin", slot);
+      } else if (hero) {
+        hero.insertAdjacentElement("afterend", slot);
+      }
       else main.insertAdjacentElement("afterbegin", slot);
     }
 
