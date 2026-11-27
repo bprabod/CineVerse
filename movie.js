@@ -226,6 +226,9 @@ function resetReviewForm() {
   setReviewRating(5);
 }
 
+
+const blockedReviewLanguage = /\\b(?:sex|sexual|porn|porno|pornography|xxx|nude|nudes|nudity|erotic|masturbat\\w*|orgasm\\w*|penis|vagina|vulva|clitoris|testicles?|boobs?|tits?|cock|dick|pussy|cum|semen|blowjob|handjob|anal|hentai|onlyfans)\\b/i;
+
 async function loadReviews() {
   try {
     if (window.cvAuthReady) await window.cvAuthReady;
@@ -290,6 +293,10 @@ $("reviewForm").addEventListener("submit", async event => {
   const reviewText = $("reviewText").value.trim();
   if (reviewText.length < 5 || reviewText.length > 1000) {
     $("reviewStatus").textContent = "Your review must be between 5 and 1000 characters.";
+    return;
+  }
+  if (blockedReviewLanguage.test(reviewText)) {
+    $("reviewStatus").textContent = "Please keep reviews family-friendly. Explicit or sexual language is not allowed.";
     return;
   }
   const title = currentTitle?.title || currentTitle?.name || "Untitled";
