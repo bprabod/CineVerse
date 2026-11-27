@@ -982,3 +982,50 @@ body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
     border: 0;
   }
 }
+
+
+/* Member reviews */
+.reviews-section{padding:28px 0 8px;border-top:1px solid rgba(255,255,255,.09)}
+.reviews-heading{align-items:center}
+.reviews-average{color:#fff;font-size:25px;font-weight:800;letter-spacing:-.8px}
+.reviews-average span{color:#888;font-size:12px;font-weight:500;letter-spacing:0}
+.reviews-summary{margin:-10px 0 20px;color:#999;font-size:11px}
+.review-compose{margin-bottom:24px;padding:20px;border:1px solid rgba(255,255,255,.1);border-radius:11px;background:rgba(255,255,255,.035)}
+.review-guest-prompt{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.review-guest-prompt[hidden],#reviewForm[hidden]{display:none!important}
+.review-guest-prompt p{margin:0;color:#bbb;font-size:13px}
+#reviewForm h3{margin:0 0 14px;font-size:16px}
+.review-rating-label{display:block;margin:12px 0 8px;color:#aaa;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.review-rating-picker{display:flex;gap:5px}
+.review-rating-picker button{padding:2px 3px;border:0;background:transparent;color:#555;font-size:27px;cursor:pointer}
+.review-rating-picker button.is-selected{color:#f5bd42}
+.review-rating-picker button:focus-visible{outline:2px solid #e50914;border-radius:4px}
+#reviewText{display:block;width:100%;min-height:105px;resize:vertical;padding:13px;border:1px solid #393939;border-radius:7px;background:#0c0c0c;color:#fff;font:13px/1.6 "DM Sans",Arial,sans-serif;outline:none}
+#reviewText:focus{border-color:#e50914;box-shadow:0 0 0 3px rgba(229,9,20,.12)}
+.review-form-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.review-form-footer>span{color:#777;font-size:10px}
+.review-form-footer>div{display:flex;gap:8px;flex-wrap:wrap}
+.review-form-footer .button{padding:9px 14px;font-size:11px}
+.review-status{min-height:16px;margin:9px 0 0;color:#f1a2a6;font-size:11px}
+.reviews-list{display:grid;gap:10px}
+.review-item{padding:17px 19px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:rgba(255,255,255,.025)}
+.review-item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.review-author{color:#f2f2f2;font-size:12px}
+.review-you{margin-left:8px;padding:3px 5px;border-radius:3px;background:rgba(229,9,20,.16);color:#ff747c;font-size:8px;font-weight:800;letter-spacing:.7px}
+.review-date{display:block;margin-top:5px;color:#777;font-size:10px}
+.review-stars{color:#f5bd42;font-size:13px;white-space:nowrap;letter-spacing:1px}
+.review-body{margin:13px 0 0;color:#c4c4c4;font-size:12px;line-height:1.8;overflow-wrap:anywhere}
+.review-actions{display:flex;justify-content:flex-end;gap:14px;margin-top:12px}
+.review-actions button{padding:3px 0;border:0;background:none;color:#999;font-size:10px;cursor:pointer}
+.review-actions button:hover{color:#fff;text-decoration:underline}
+.reviews-empty{padding:20px 0;color:#888;font-size:12px;line-height:1.7}
+@media(max-width:600px){
+ .review-compose{padding:15px}
+ .review-guest-prompt{align-items:flex-start;flex-direction:column}
+ .review-item{padding:14px}
+ .review-item-top{gap:8px}
+ .review-stars{font-size:11px;letter-spacing:0}
+ .review-form-footer{align-items:flex-start;flex-direction:column}
+ .review-form-footer>div{width:100%}
+ .review-form-footer .button{flex:1}
+}
