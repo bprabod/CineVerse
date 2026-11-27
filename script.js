@@ -134,27 +134,52 @@ async function loadDatabaseHero() {
       fetch(`${SUPABASE_URL}/rest/v1/homepage_content?select=cta_label,cta_href,side_note,side_count&id=eq.1`, { headers })
     ]);
 
-    let featured = null;
-    if (backgroundResponse.ok) {
-      const rows = await backgroundResponse.json();
-      featured = rows[0] || null;
-    } else {
-      console.warn("Could not read featured background from Supabase.");
+    if (!backgroundResponse.ok) throw new Error("Could not load featured movie data.");
+    const backgroundRows = await backgroundResponse.json();
+    const featured = backgroundRows[0];
+    if (!featured || !featured.backdrop_path) return;
+
+    let content = null;
+    if (contentResponse.ok) {
+      const contentRows = await contentResponse.json();
+      content = contentRows[0] || null;
     }
 
-    // The title, year, rating and synopsis always come from the same
-    // database record as the featured backdrop image.
-    if (featured) {
-      const titleText = featured.title || "Featured movie";
-      const words = titleText.trim().split(/\s+/);
-      const titleLine1 = words.length > 1 ? words.slice(0, -1).join(" ") : titleText;
-      const titleLine2 = words.length > 1 ? words[words.length - 1] : "";
-      const title = document.querySelector(".hero-content h1");
-      const eyebrow = document.querySelector(".hero-content .eyebrow");
-      const kicker = document.querySelector(".hero-kicker");
-      const description = document.querySelector(".hero-description");
-      const meta = document.querySelector(".hero-meta");
+    // Preload the new backdrop first. Keep the old image and its matching
+    // text visible until the new image is ready, then swap the whole hero
+    // together so users never see a mismatched title and background.
+    const imageVersion = featured.updated_at ? new Date(featured.updated_at).getTime() : Date.now();
+    const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}?v=${imageVersion}`;
+    const preload = new Image();
+    preload.src = backdrop;
+    try {
+      if (typeof preload.decode === "function") {
+        await preload.decode();
+      } else {
+        await new Promise((resolve, reject) => {
+          preload.onload = resolve;
+          preload.onerror = reject;
+        });
+      }
+    } catch (imageError) {
+      console.warn("Featured backdrop could not be prepared; keeping the previous hero.", imageError);
+      return;
+    }
 
+    const titleText = featured.title || "Featured movie";
+    const words = titleText.trim().split(/\s+/);
+    const titleLine1 = words.length > 1 ? words.slice(0, -1).join(" ") : titleText;
+    const titleLine2 = words.length > 1 ? words[words.length - 1] : "";
+    const title = document.querySelector(".hero-content h1");
+    const eyebrow = document.querySelector(".hero-content .eyebrow");
+    const kicker = document.querySelector(".hero-kicker");
+    const description = document.querySelector(".hero-description");
+    const meta = document.querySelector(".hero-meta");
+    const image = document.querySelector(".hero-image");
+
+    // Apply the backdrop and all matching movie details in one animation frame.
+    requestAnimationFrame(() => {
+      if (image) image.style.backgroundImage = `url("${backdrop}")`;
       if (eyebrow) eyebrow.innerHTML = '<span class="live-dot"></span> FEATURED MOVIE';
       if (kicker) kicker.textContent = "NOW SHOWING ON CINEVERSE";
       if (title) title.innerHTML = `${escapeHtml(titleLine1)}${titleLine2 ? `<br><span>${escapeHtml(titleLine2)}</span>` : ""}`;
@@ -169,24 +194,6 @@ async function loadDatabaseHero() {
         ].join("");
       }
 
-      if (featured.backdrop_path) {
-        const imageVersion = featured.updated_at ? new Date(featured.updated_at).getTime() : Date.now();
-        const backdrop = `${IMAGE_BASE}original${featured.backdrop_path}?v=${imageVersion}`;
-        const preload = new Image();
-        preload.onload = () => {
-          const image = document.querySelector(".hero-image");
-          if (image) image.style.backgroundImage = `url("${backdrop}")`;
-        };
-        preload.onerror = () => console.warn("Could not load the Supabase featured backdrop image.");
-        preload.src = backdrop;
-      }
-    }
-
-    // Keep only presentation controls in homepage_content; it no longer
-    // supplies a separate, potentially mismatched movie title or synopsis.
-    if (contentResponse.ok) {
-      const rows = await contentResponse.json();
-      const content = rows[0];
       if (content) {
         const cta = document.querySelector(".hero-buttons .button-primary");
         const sideNote = document.querySelector(".hero-side-note");
@@ -203,9 +210,7 @@ async function loadDatabaseHero() {
           }
         }
       }
-    } else {
-      console.warn("Could not read homepage presentation settings from Supabase.");
-    }
+    });
   } catch (error) {
     console.warn("Using the built-in homepage hero because saved homepage content is unavailable:", error);
   }
