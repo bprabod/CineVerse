@@ -439,6 +439,15 @@
 .hero-content.is-changing{opacity:0;transform:translateY(16px);filter:blur(3px)}
 @media(max-width:700px){.card-info h3{font-size:11px;min-height:28px}.card-info{padding:9px 8px 8px}}
 
-/* Long featured titles use balanced two-line wrapping and a smaller scale. */
-.hero h1.is-long-title{font-size:clamp(38px,5.1vw,68px);line-height:1.02;letter-spacing:-3px;max-width:720px}
-@media(max-width:760px){.hero h1.is-long-title{font-size:clamp(31px,7.1vw,46px);line-height:1.04;letter-spacing:-1.8px;max-width:100%}}
+/* Long featured titles shrink automatically to stay inside the hero layout. */
+.hero h1.is-long-title{
+  font-size:clamp(30px,min(5.2vw,var(--hero-title-size,78px)),78px);
+  line-height:1.04;letter-spacing:-2.4px;max-width:760px;
+  overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+  .hero h1.is-long-title{
+    font-size:clamp(29px,min(7vw,var(--hero-title-size,52px)),52px);
+    line-height:1.05;letter-spacing:-1.5px;max-width:100%;
+  }
+}
