@@ -1,11 +1,66 @@
 const adminStatus = document.getElementById("adminStatus");
 const adminStats = document.getElementById("adminStats");
+const adminTools = document.getElementById("adminTools");
 const adminSignOut = document.getElementById("adminSignOut");
+const memberList = document.getElementById("adminMemberList");
+const reviewList = document.getElementById("adminReviewList");
+const memberSearch = document.getElementById("memberSearch");
+let memberRows = [];
 
 function adminEscape(value) {
   return String(value ?? "").replace(/[&<>"']/g, ch => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   }[ch]));
+}
+
+function renderMembers(filter = "") {
+  const term = filter.trim().toLowerCase();
+  const rows = memberRows.filter(member => String(member.username || "").toLowerCase().includes(term));
+  document.getElementById("memberDirectoryCount").textContent = rows.length + " SHOWN";
+  if (!rows.length) {
+    memberList.innerHTML = '<p class="admin-empty">No matching members found.</p>';
+    return;
+  }
+  memberList.innerHTML = rows.map(member =>
+    '<article class="admin-member"><span class="admin-member-name">' + adminEscape(member.username || "Unnamed member") +
+    '</span><span class="admin-member-tag">MEMBER</span></article>'
+  ).join("");
+}
+
+async function loadMembers() {
+  const { data, error, count } = await cvSupabase.from("profiles")
+    .select("id,username", { count:"exact" })
+    .order("username", { ascending:true })
+    .limit(1000);
+  if (error) throw error;
+  memberRows = data || [];
+  document.getElementById("memberCount").textContent = String(count ?? memberRows.length);
+  renderMembers(memberSearch.value);
+}
+
+async function loadReviews() {
+  const { data, error, count } = await cvSupabase.from("title_reviews")
+    .select("id,title,reviewer_name,rating,review_text,created_at,media_type", { count:"exact" })
+    .order("created_at", { ascending:false })
+    .limit(30);
+  if (error) throw error;
+  document.getElementById("reviewCount").textContent = String(count ?? 0);
+  if (!data?.length) {
+    reviewList.innerHTML = '<p class="admin-empty">No community reviews yet.</p>';
+    return;
+  }
+  reviewList.innerHTML = data.map(review => {
+    const date = new Date(review.created_at);
+    const dateLabel = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+    const stars = "★".repeat(Number(review.rating) || 0) + "☆".repeat(5-(Number(review.rating) || 0));
+    return '<article class="admin-review"><div class="admin-review-main"><strong class="admin-review-title">' +
+      adminEscape(review.title || "Untitled") + '</strong><span class="admin-review-meta">' +
+      adminEscape(review.reviewer_name || "CineVerse member") + ' · ' + adminEscape(review.media_type === "tv" ? "SERIES" : "MOVIE") + ' · ' + adminEscape(dateLabel) +
+      '</span><p class="admin-review-text">' + adminEscape(review.review_text || "") +
+      '</p><span class="admin-review-rating" aria-label="' + (Number(review.rating)||0) + ' out of 5 stars">' + stars +
+      '</span></div><div class="admin-review-actions"><button class="admin-delete-review" type="button" data-review-id="' +
+      Number(review.id) + '">Delete</button></div></article>';
+  }).join("");
 }
 
 async function loadAdminDashboard(user) {
@@ -20,39 +75,30 @@ async function loadAdminDashboard(user) {
 
   adminStatus.textContent = "Administrator access verified.";
   adminStats.hidden = false;
+  adminTools.hidden = false;
+  await Promise.all([loadMembers(), loadReviews()]);
+}
 
-  const [membersResult, reviewsResult, recentResult] = await Promise.all([
-    cvSupabase.from("profiles").select("id", { count:"exact", head:true }),
-    cvSupabase.from("title_reviews").select("id", { count:"exact", head:true }),
-    cvSupabase.from("title_reviews")
-      .select("title,reviewer_name,rating,review_text,created_at,media_type")
-      .order("created_at", { ascending:false }).limit(8)
-  ]);
-  if (membersResult.error) throw membersResult.error;
-  if (reviewsResult.error) throw reviewsResult.error;
-  if (recentResult.error) throw recentResult.error;
+memberSearch.addEventListener("input", () => renderMembers(memberSearch.value));
 
-  document.getElementById("memberCount").textContent = String(membersResult.count ?? 0);
-  document.getElementById("reviewCount").textContent = String(reviewsResult.count ?? 0);
-
-  const list = document.getElementById("adminReviewList");
-  const section = document.getElementById("recentReviewsSection");
-  section.hidden = false;
-  if (!recentResult.data?.length) {
-    list.innerHTML = '<p class="admin-status">No community reviews yet.</p>';
+reviewList.addEventListener("click", async event => {
+  const button = event.target.closest("[data-review-id]");
+  if (!button) return;
+  const reviewId = Number(button.dataset.reviewId);
+  if (!Number.isSafeInteger(reviewId) || reviewId <= 0) return;
+  if (!confirm("Permanently delete this community review? This cannot be undone.")) return;
+  button.disabled = true;
+  button.textContent = "Deleting…";
+  const { error } = await cvSupabase.from("title_reviews").delete().eq("id", reviewId);
+  if (error) {
+    adminStatus.textContent = "Could not delete this review: " + error.message;
+    button.disabled = false;
+    button.textContent = "Delete";
     return;
   }
-  list.innerHTML = recentResult.data.map(review => {
-    const date = new Date(review.created_at);
-    const dateLabel = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
-    const stars = "★".repeat(Number(review.rating) || 0) + "☆".repeat(5-(Number(review.rating) || 0));
-    return '<article class="admin-review"><div class="admin-review-main"><strong class="admin-review-title">' +
-      adminEscape(review.title || "Untitled") + '</strong><span class="admin-review-meta">' +
-      adminEscape(review.reviewer_name || "CineVerse member") + ' · ' + adminEscape(review.media_type === "tv" ? "SERIES" : "MOVIE") + ' · ' + adminEscape(dateLabel) +
-      '</span><p class="admin-review-text">' + adminEscape(review.review_text || "") +
-      '</p></div><span class="admin-review-rating" aria-label="' + (Number(review.rating)||0) + ' out of 5 stars">' + stars + '</span></article>';
-  }).join("");
-}
+  adminStatus.textContent = "Review deleted.";
+  await loadReviews();
+});
 
 (async () => {
   try {
