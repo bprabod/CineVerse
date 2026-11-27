@@ -2,6 +2,29 @@ const $ = id => document.getElementById(id);
 let authMode = "signin";
 let showForgotPassword = false;
 const isPasswordReset = new URLSearchParams(location.search).get("mode") === "reset";
+
+const passwordFields = ["password","confirmPassword","newPassword","confirmNewPassword"];
+passwordFields.forEach(id => {
+ const input = $(id);
+ const wrapper = document.createElement("div");
+ wrapper.className = "password-field";
+ input.parentNode.insertBefore(wrapper,input);
+ wrapper.appendChild(input);
+ const toggle = document.createElement("button");
+ toggle.type = "button";
+ toggle.className = "password-visibility-toggle";
+ toggle.textContent = "Show";
+ toggle.setAttribute("aria-label","Show password");
+ toggle.setAttribute("aria-pressed","false");
+ toggle.addEventListener("click",() => {
+  const reveal = input.type === "password";
+  input.type = reveal ? "text" : "password";
+  toggle.textContent = reveal ? "Hide" : "Show";
+  toggle.setAttribute("aria-label",reveal ? "Hide password" : "Show password");
+  toggle.setAttribute("aria-pressed",String(reveal));
+ });
+ wrapper.appendChild(toggle);
+});
 const setMode = mode => {
  authMode = mode;
  const signup = mode === "signup";
