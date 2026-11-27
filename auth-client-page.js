@@ -65,8 +65,8 @@ $("authForm").addEventListener("submit", async e => {
   if(authMode === "reset"){
    const {error} = await cvSupabase.auth.updateUser({password:resetPassword});
    if(error) throw error;
-   $("authStatus").textContent = "Password updated successfully. You can now sign in.";
    setMode("signin");
+   $("authStatus").textContent = "Password updated successfully. You can now sign in.";
    return;
   }
   if(authMode === "signin"){
