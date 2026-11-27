@@ -15,6 +15,33 @@ let toastTimer;
 let activeMovie = null;
 
 const $ = id => document.getElementById(id);
+function releaseCountdownHTML(dateValue) {
+  return formatReleaseCountdown(dateValue) ? '<span class="release-countdown-inline" data-release-countdown="' + escapeHtml(dateValue) + '"></span>' : '';
+}
+function formatReleaseCountdown(dateValue) {
+  const match = String(dateValue || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return '';
+  const target = new Date(Number(match[1]), Number(match[2])-1, Number(match[3]));
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.floor((target.getTime()-today.getTime())/86400000);
+  if (days < 0) return '';
+  if (days === 0) return 'RELEASES TODAY';
+  const remaining = Math.max(0, target.getTime()-now.getTime());
+  const d = Math.floor(remaining/86400000);
+  const h = Math.floor((remaining%86400000)/3600000);
+  const m = Math.floor((remaining%3600000)/60000);
+  const s = Math.floor((remaining%60000)/1000);
+  return d + 'd : ' + String(h).padStart(2,'0') + 'h : ' + String(m).padStart(2,'0') + 'm : ' + String(s).padStart(2,'0') + 's';
+}
+function refreshReleaseCountdowns() {
+  document.querySelectorAll('[data-release-countdown]').forEach(node => {
+    const value = formatReleaseCountdown(node.dataset.releaseCountdown);
+    if (!value) { node.hidden = true; return; }
+    node.hidden = false; node.textContent = value;
+  });
+}
+setInterval(refreshReleaseCountdowns, 1000);
 const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
   "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
 }[char]));
@@ -46,7 +73,8 @@ function normalize(item, type = "movie") {
     image: imageUrl(item.poster_path),
     backdrop: imageUrl(item.backdrop_path, "w1280"),
     description: item.overview || "No synopsis is available yet.",
-    tag: item.tagline || ""
+    tag: item.tagline || "",
+    releaseDate: item.release_date || item.first_air_date || ""
   };
 }
 
@@ -58,6 +86,7 @@ function movieCard(movie) {
       loading="lazy" onerror="this.src='${FALLBACK_POSTER}'">
     <div class="card-gradient"></div>
     <span class="card-top">${movie.type === "tv" ? "SERIES" : "TMDB"}</span>
+    ${movie.releaseDate ? '<span class="release-countdown-badge" data-release-countdown="' + escapeHtml(movie.releaseDate) + '"></span>' : ''}
     <div class="card-info"><h3>${escapeHtml(movie.title)}</h3>
       <p>${escapeHtml(movie.year)} &nbsp;·&nbsp; ★ ${escapeHtml(movie.rating)}</p></div>
   </a>`;
@@ -177,7 +206,7 @@ async function showHeroSlide(index) {
     const description = document.querySelector('.hero-description');
     const meta = document.querySelector('.hero-meta');
     if (eyebrow) eyebrow.innerHTML = '<span class="live-dot"></span> FEATURED MOVIE';
-    if (kicker) kicker.textContent = 'NOW SHOWING ON CINEVERSE';
+    if (kicker) kicker.innerHTML = releaseCountdownHTML(movie.release_date) || 'NOW SHOWING ON CINEVERSE';
     if (title) {
       title.classList.toggle('is-long-title', isLongTitle);
       if (isLongTitle) title.style.setProperty('--hero-title-size', `${titleFontSize}px`);
@@ -194,6 +223,7 @@ async function showHeroSlide(index) {
       cta.innerHTML = `<span class="play-symbol">▶</span> ${escapeHtml(heroContent?.cta_label || 'Explore title')}`;
       cta.href = `movie.html?id=${encodeURIComponent(movie.tmdb_id || movie.id)}&type=movie`;
     }
+    refreshReleaseCountdowns();
     const count = $('heroSlideCount');
     if (count) count.textContent = `${String(nextIndex + 1).padStart(2, '0')} / ${String(heroSlides.length).padStart(2, '0')}`;
     requestAnimationFrame(() => {
@@ -276,7 +306,7 @@ async function openMovie(id, type) {
   $("dialogGenre").textContent = movie.type === "tv" ? "TV SERIES" : "MOVIE";
   $("dialogDescription").textContent = movie.description;
   $("dialogArt").style.backgroundImage = `linear-gradient(0deg,#14141400,#0005),url("${movie.backdrop}")`;
-  $("dialogMeta").innerHTML = `<span class="match">★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span class="rating">TMDB</span>`;
+  $("dialogMeta").innerHTML = `<span class="match">★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span class="rating">TMDB</span>${releaseCountdownHTML(movie.releaseDate)}`;
   dialogWatchlistEntryId = null;
   $("dialogWatch").textContent = "＋ Add to Watchlist";
   try {
@@ -284,11 +314,13 @@ async function openMovie(id, type) {
     movie = { ...movie, description: detail.overview || movie.description,
       genre: (detail.genres || []).map(g => g.name).join(" · ") || movie.genre,
       backdrop: imageUrl(detail.backdrop_path, "w1280"),
-      tag: detail.tagline || "" };
+      tag: detail.tagline || "", releaseDate: detail.release_date || detail.first_air_date || movie.releaseDate };
     activeMovie = movie;
     $("dialogDescription").textContent = movie.description;
     $("dialogGenre").textContent = movie.genre;
     $("dialogArt").style.backgroundImage = `linear-gradient(0deg,#14141400,#0005),url("${movie.backdrop}")`;
+    $("dialogMeta").innerHTML = `<span class="match">★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span class="rating">TMDB</span>${releaseCountdownHTML(movie.releaseDate)}`;
+    refreshReleaseCountdowns();
   } catch (error) {
     console.warn("Could not load extended title details:", error);
   }
