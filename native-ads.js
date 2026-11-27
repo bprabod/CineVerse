@@ -23,8 +23,14 @@
     container.id = CONTAINER_ID;
 
     slot.append(label, container);
-    if (document.body.classList.contains("detail-page")) main.insertAdjacentElement("beforebegin", slot);
-    else main.insertAdjacentElement("afterend", slot);
+
+    if (document.body.classList.contains("detail-page")) {
+      main.insertAdjacentElement("beforebegin", slot);
+    } else {
+      const hero = main.querySelector(".hero");
+      if (hero) hero.insertAdjacentElement("afterend", slot);
+      else main.insertAdjacentElement("afterbegin", slot);
+    }
 
     window.atOptions = {
       key: "8c48a877aab4e99e8ae550bad5ef3328",
