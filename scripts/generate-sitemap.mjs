@@ -42,7 +42,7 @@ await Promise.all([
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
   `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  [...entries.keys()].map(url => `  <url><loc>${url}</loc></url>`).join("\n") +
+  [...entries.keys()].map(url => `  <url><loc>${url.replace(/&/g, "&amp;")}</loc></url>`).join("\n") +
   "\n</urlset>\n";
 
 await writeFile("sitemap.xml", xml, "utf8");
