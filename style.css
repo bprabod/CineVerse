@@ -1029,3 +1029,24 @@ body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
  .review-form-footer>div{width:100%}
  .review-form-footer .button{flex:1}
 }
+
+/* Collapsible reviews and compact community entries */
+.reviews-heading-actions{display:flex;align-items:center;gap:14px}
+.reviews-toggle-button{padding:9px 13px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:#e50914;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
+.reviews-toggle-button:hover{background:#b80710;border-color:#b80710}
+.reviews-panel[hidden]{display:none!important}
+.reviews-panel{padding-top:15px}
+.reviews-panel .reviews-summary{margin:0 0 13px}
+.reviews-panel .review-compose{margin-bottom:15px;padding:15px}
+.reviews-panel .reviews-list{gap:6px}
+.reviews-panel .review-item{padding:10px 13px;border-radius:7px}
+.reviews-panel .review-item-top{align-items:center;gap:8px}
+.reviews-panel .review-author{font-size:11px}
+.reviews-panel .review-date{display:inline-block;margin:0 0 0 8px;font-size:9px}
+.reviews-panel .review-you{margin-left:6px;font-size:7px}
+.reviews-panel .review-stars{font-size:11px;letter-spacing:0}
+.reviews-panel .review-body{margin:6px 0 0;font-size:11px;line-height:1.55}
+.reviews-panel .review-actions{margin-top:6px;gap:11px}
+.reviews-panel .review-actions button{font-size:9px}
+.reviews-panel .reviews-empty{padding:10px 0;font-size:11px}
+@media(max-width:600px){.reviews-heading-actions{gap:8px}.reviews-toggle-button{padding:8px 10px;font-size:10px}.reviews-average{font-size:20px}.reviews-panel .review-item{padding:9px 10px}}
