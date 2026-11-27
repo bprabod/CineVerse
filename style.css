@@ -587,3 +587,10 @@
 @media(max-width:600px){
   .watchlist-grid{grid-auto-columns:clamp(145px,42vw,190px);gap:11px}
 }
+
+
+/* TMDB upcoming release countdowns across CineVerse. */
+.release-countdown-badge{position:absolute;z-index:3;top:38px;left:8px;right:8px;display:block;width:max-content;max-width:calc(100% - 16px);padding:5px 7px;border:1px solid rgba(255,255,255,.22);border-radius:3px;background:rgba(8,8,8,.88);color:#fff;font-size:8px;font-weight:800;letter-spacing:.35px;line-height:1.25;white-space:normal;box-shadow:0 2px 10px #0008}
+.release-countdown-inline{display:inline-block;padding:4px 7px;border-radius:3px;background:rgba(229,9,20,.16);border:1px solid rgba(229,9,20,.55);color:#ff777d;font-size:10px;font-weight:800;letter-spacing:.35px}
+.release-countdown-detail{display:inline-block;margin:12px 0 0;padding:9px 12px;border:1px solid rgba(229,9,20,.55);border-radius:5px;background:rgba(229,9,20,.12);color:#ff777d;font-size:12px;font-weight:800;letter-spacing:.45px}
+.release-countdown-detail[hidden]{display:none}
