@@ -771,3 +771,9 @@
 .password-field .password-visibility-toggle:hover,
 .password-field .password-visibility-toggle:focus-visible{color:#ff5b64;outline-offset:3px}
 .password-field[hidden]{display:none!important}
+
+/* Keep mutually exclusive account actions hidden in flex headers */
+.header-actions [hidden]{display:none!important}
+/* Compact eye icon for password visibility */
+.password-field .password-visibility-toggle{width:30px;height:30px;display:flex;align-items:center;justify-content:center;padding:0}
+.password-field .password-visibility-toggle svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
