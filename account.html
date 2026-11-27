@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#090909">
   <title>My Account | CineVerse</title>
   <link rel="icon" href="favicon.svg?v=6">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=account-delete-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js"></script>
-  <script defer src="account.js?v=3"></script>
+  <script defer src="account.js?v=4"></script>
 </head>
 <body class="detail-page">
   <header class="site-header member-site-header">
@@ -31,6 +31,32 @@
       </div>
       <p id="accountStatus" class="detail-status" role="status"></p>
     </section>
+
+    <section class="account-danger-zone" aria-labelledby="deleteAccountHeading">
+      <div>
+        <p class="section-kicker">ACCOUNT CONTROL</p>
+        <h2 id="deleteAccountHeading">Delete account</h2>
+        <p class="account-danger-copy">Permanently remove your CineVerse account. This action cannot be undone.</p>
+      </div>
+      <button class="button account-delete-button" id="openDeleteAccount" type="button">Delete Account</button>
+    </section>
   </main>
+
+  <dialog class="account-delete-dialog" id="deleteAccountDialog" aria-labelledby="deleteDialogTitle">
+    <form id="deleteAccountForm">
+      <p class="section-kicker">PERMANENT ACTION</p>
+      <h2 id="deleteDialogTitle">Delete your account?</h2>
+      <p class="delete-dialog-copy">Your CineVerse sign-in and account will be permanently deleted. To confirm it is really you, enter your current password and type DELETE below.</p>
+      <label class="delete-field" for="deleteAccountPassword">Current password</label>
+      <input class="delete-input" id="deleteAccountPassword" type="password" autocomplete="current-password" required>
+      <label class="delete-field" for="deleteAccountConfirm">Type DELETE to confirm</label>
+      <input class="delete-input" id="deleteAccountConfirm" type="text" autocomplete="off" required>
+      <p class="delete-account-status" id="deleteAccountStatus" role="status" aria-live="polite"></p>
+      <div class="delete-dialog-actions">
+        <button class="button button-secondary" id="cancelDeleteAccount" type="button">Cancel</button>
+        <button class="button account-delete-button" id="confirmDeleteAccount" type="submit">Permanently Delete</button>
+      </div>
+    </form>
+  </dialog>
 </body>
 </html>
