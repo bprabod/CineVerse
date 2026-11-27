@@ -3,6 +3,26 @@ let authMode = "signin";
 let showForgotPassword = false;
 const isPasswordReset = new URLSearchParams(location.search).get("mode") === "reset";
 
+const passwordInput = $("password");
+const passwordWrap = document.createElement("div");
+passwordWrap.className = "password-field";
+passwordInput.parentNode.insertBefore(passwordWrap, passwordInput);
+passwordWrap.appendChild(passwordInput);
+const passwordToggle = document.createElement("button");
+passwordToggle.type = "button";
+passwordToggle.className = "password-visibility-toggle";
+passwordToggle.textContent = "Show";
+passwordToggle.setAttribute("aria-label", "Show password");
+passwordToggle.setAttribute("aria-pressed", "false");
+passwordToggle.addEventListener("click", () => {
+ const reveal = passwordInput.type === "password";
+ passwordInput.type = reveal ? "text" : "password";
+ passwordToggle.textContent = reveal ? "Hide" : "Show";
+ passwordToggle.setAttribute("aria-label", reveal ? "Hide password" : "Show password");
+ passwordToggle.setAttribute("aria-pressed", String(reveal));
+});
+passwordWrap.appendChild(passwordToggle);
+
 const setMode = mode => {
  authMode = mode;
  const signup = mode === "signup";
@@ -21,7 +41,7 @@ const setMode = mode => {
  $("newPassword").required = reset;
  $("confirmNewPassword").hidden = !reset;
  $("confirmNewPassword").required = reset;
- passwordFields.forEach(id => { const input = $(id); input.closest(".password-field").hidden = input.hidden; });
+ passwordWrap.hidden = passwordInput.hidden;
  $("password").setAttribute("autocomplete", signup || reset ? "new-password" : "current-password");
  $("modePrompt").innerHTML = reset || forgot
   ? 'Remembered your password? <a href="#signin" id="modeToggle">Sign in</a>'
