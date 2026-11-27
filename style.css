@@ -759,3 +759,15 @@
   outline-offset:3px;
 }
 
+
+/* Single password visibility control */
+.password-field{position:relative;width:100%;min-width:0}
+.password-field input{box-sizing:border-box;width:100%;padding-right:66px!important}
+.password-field .password-visibility-toggle{
+ position:absolute;right:12px;top:50%;transform:translateY(-50%);
+ padding:5px 3px;border:0;background:transparent;color:rgba(255,255,255,.58);
+ font:600 11px/1 inherit;letter-spacing:.2px;cursor:pointer;transition:color .16s ease;
+}
+.password-field .password-visibility-toggle:hover,
+.password-field .password-visibility-toggle:focus-visible{color:#ff5b64;outline-offset:3px}
+.password-field[hidden]{display:none!important}
