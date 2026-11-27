@@ -9,7 +9,9 @@
   <link rel="icon" href="favicon.svg?v=6">
   <link rel="stylesheet" href="style.css?v=admin-tools-2">
   <style>
-    body.admin-locked .admin-header, body.admin-locked .admin-main { display:none !important; }
+    body.admin-locked .admin-header, body.admin-locked .admin-kicker, body.admin-locked .admin-title, body.admin-locked .admin-subtitle, body.admin-locked #adminStats, body.admin-locked #adminTools, body.admin-locked .admin-back { display:none !important; }
+    body.admin-locked .admin-main { display:block !important; padding-top:32px; }
+    body.admin-locked #adminStatus { display:block !important; }
     .admin-page{min-height:100vh;background:#080808;background-image:radial-gradient(ellipse at 50% 0%,rgba(130,10,20,.2),transparent 44%)}
     .admin-header{position:relative;background:rgba(5,5,5,.94);border-bottom:1px solid rgba(255,255,255,.09);backdrop-filter:blur(14px)}
     .admin-main{width:min(100% - 44px,1100px);margin:0 auto;padding:54px 0 90px}
@@ -53,7 +55,7 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="auth-client.js?v=2"></script>
-  <script defer src="admin.js?v=admin-tools-3"></script>
+  <script defer src="admin.js?v=admin-tools-4"></script>
 </head>
 <body class="detail-page admin-page admin-locked">
   <header class="site-header admin-header">
