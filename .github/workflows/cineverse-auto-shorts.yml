@@ -1,0 +1,54 @@
+name: CineVerse Auto Shorts
+
+on:
+  schedule:
+    - cron: "30 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cineverse-auto-shorts
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: automation/requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: automation/state/seen_movies.json
+          key: cineverse-seen-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            cineverse-seen-${{ runner.os }}-
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Install dependencies
+        run: pip install -r automation/requirements.txt
+      - name: Create and publish original Shorts
+        working-directory: automation
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MAX_UPLOADS_PER_RUN: "2"
+        run: python create_shorts.py
+      - name: Save processed IDs
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: automation/state/seen_movies.json
+          key: cineverse-seen-${{ runner.os }}-${{ github.run_id }}
