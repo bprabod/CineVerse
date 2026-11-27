@@ -272,8 +272,20 @@ $("toggleReviews").addEventListener("click", () => {
   const opening = panel.hidden;
   panel.hidden = !opening;
   $("toggleReviews").setAttribute("aria-expanded", String(opening));
-  $("toggleReviews").textContent = opening ? "Hide reviews" : "Add a review";
+  $("toggleReviews").classList.toggle("is-open", opening);
   if (opening) panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+$("writeReviewButton").addEventListener("click", () => {
+  const form = $("reviewForm");
+  if (form.hidden) {
+    form.hidden = false;
+    $("reviewGuestPrompt").hidden = true;
+    form.scrollIntoView({behavior:"smooth",block:"center"});
+  } else {
+    form.scrollIntoView({behavior:"smooth",block:"center"});
+    $("reviewText").focus();
+  }
 });
 
 $("reviewRatingPicker").addEventListener("click", event => {
