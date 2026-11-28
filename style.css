@@ -1136,3 +1136,8 @@ body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
   .cv-banner-ad-stack{width:calc(100% - 24px);gap:14px;margin:26px auto 32px}
   .cv-banner-ad-slot{min-height:50px}
 }
+
+
+/* Keep the single homepage banner visible near the top on first load. */
+.cv-banner-ad-top{margin:10px auto 14px;}
+@media(max-width:600px){.cv-banner-ad-top{margin:8px auto 10px;}}
