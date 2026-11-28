@@ -1105,3 +1105,34 @@ body>.site-footer{width:100%;margin-top:auto;flex-shrink:0;}
  .reviews-accordion-meta .reviews-average{font-size:16px}
  .reviews-chevron{font-size:20px}
 }
+
+
+/* Responsive 468x60 banner placements */
+.cv-banner-ad-stack{
+  width:min(100% - 32px, 468px);
+  margin:34px auto 42px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+.cv-banner-ad-slot{
+  width:100%;
+  min-height:60px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:6px;
+}
+.cv-banner-ad-slot iframe{
+  display:block;
+  max-width:100%;
+  border:0;
+}
+@media(max-width:500px){
+  .cv-banner-ad-stack{width:calc(100% - 24px);gap:14px;margin:26px auto 32px}
+  .cv-banner-ad-slot{min-height:50px}
+}
