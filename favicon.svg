@@ -1,4 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect x="2" y="2" width="60" height="60" rx="15" fill="#e50914"/>
-  <text x="32" y="39" text-anchor="middle" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="800" letter-spacing="-1">CV</text>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#171717"/>
+      <stop offset="1" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff3344"/>
+      <stop offset="1" stop-color="#e50914"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)" stroke="#e50914" stroke-width="2"/>
+  <circle cx="32" cy="32" r="19" fill="none" stroke="#e50914" stroke-width="1.7" opacity=".9"/>
+  <ellipse cx="32" cy="32" rx="25" ry="9" transform="rotate(-35 32 32)" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".8"/>
+  <circle cx="50" cy="19" r="3.2" fill="#ffffff"/>
+  <path d="M32 17l2.1 6.2 6.2 2.1-6.2 2.1L32 34l-2.1-6.6-6.2-2.1 6.2-2.1z" fill="#ffffff"/>
+  <text x="32" y="46" text-anchor="middle" fill="url(#red)" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="900" letter-spacing="-1">CV</text>
 </svg>
